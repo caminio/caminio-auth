@@ -5,6 +5,6 @@
 
 module.exports.routes = {
   
-  'GET /login': 'V1::AuthController#login'
+  '/login': 'Auth::V1::AuthController#login'
 
 }

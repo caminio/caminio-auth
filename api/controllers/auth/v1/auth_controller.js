@@ -8,18 +8,24 @@
  *
  */
 
+var passport      = require('passport');
+
 module.exports = function AuthController( caminio, policies, middleware ){
 
   return {
 
-    'login': [
+    'POST login': [
       resetSession,
       passport.authenticate('local', { 
         successReturnToOrRedirect: '/caminio', 
         failureRedirect: '/login',
-        failureFlash: true }) 
-      )]
+        failureFlash: true 
+      })],
 
+    'login': 
+      function( req, res ){
+        res.caminio.render();
+      }
   }
 
 }

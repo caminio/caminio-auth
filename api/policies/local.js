@@ -13,6 +13,10 @@ var passport = require('passport')
 
 module.exports = function( caminio ){
 
+
+  caminio.express.use( passport.initialize() );
+  caminio.express.use( passport.session() );
+
   /**
    * LocalStrategy
    *
@@ -53,5 +57,7 @@ module.exports = function( caminio ){
       }
     });
   });
+
+  return null;
 
 }
