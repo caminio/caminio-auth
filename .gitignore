@@ -1,0 +1,11 @@
+node_modules
+.DS_Store
+lib-cov
+coverage.html
+npm-debug.log
+doc
+.tmp
+test.log
+test.log
+test.log
+test.log

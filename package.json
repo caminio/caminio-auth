@@ -1,0 +1,32 @@
+{
+  "name": "caminio-auth",
+  "description": "authentication plugin (gear) for caminio",
+  "version": "0.0.1",
+  "private": false,
+  "author": "quaqua <quaqua@tastenwerk.com>",
+  "keywords": [
+    "caminio",
+    "authentication",
+    "passport"
+  ],
+  "dependencies": {
+    "crypto": "0.0.3",
+    "passport": "~0.1.18",
+    "passport-local": "~0.1.6"
+  },
+  "devDependencies": {
+    "caminio-fixtures": "git://github.com/tastenwerk/caminio-fixtures#0.1.1",
+    "mocha": "~1.15.1",
+    "chai": "~1.8.1",
+    "superagent": "~0.15.7",
+    "grunt": "~0.4.2",
+    "grunt-mocha-test": "~0.8.2",
+    "mongoose": "~3.8.4"
+  },
+  "main": "lib/caminio.js",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tastenwerk/caminio.git"
+  }
+}
