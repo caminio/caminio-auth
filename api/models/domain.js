@@ -15,38 +15,41 @@
  
 module.exports = function GroupModel( caminio, mongoose ){
 
-  var Schema = new mongoose.Schema({
+  var ObjectId = mongoose.Schema.Types.ObjectId;
+
+  var schema = new mongoose.Schema({
       name: { type: String, 
               required: true,
               lowercase: true,
               required: true,
               index: { unique: true },
               validate: [ DomainNameValidator, 'invalid domain name' ] },
-      users: [ { type: mongoose.Schema.Types.ObjectId, ref: 'User' } ],
-      groups: [ { type: mongoose.Schema.Types.ObjectId, ref: 'Group' } ],
-      owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      users: [ { type: ObjectId, ref: 'User' } ],
+      groups: [ { type: ObjectId, ref: 'Group' } ],
+      owner: { type: ObjectId, ref: 'User' },
       plan: { type: String, default: 'default' },
       preferences: { type: mongoose.Schema.Types.Mixed },
       allowed_gears: { type: Array, default: ['caminio-dashboard'] },
       //messages: [ MessageSchema ],
       created: { 
         at: { type: Date, default: Date.now },
-        by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+        by: { type: ObjectId, ref: 'User' }
       },
       updated: { 
         at: { type: Date, default: Date.now },
-        by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+        by: { type: ObjectId, ref: 'User' }
       },
       locked: {
         at: { type: Date },
-        by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+        by: { type: ObjectId, ref: 'User' }
       },
       description: String,
   });
 
-  Schema.method( 'lock', lock );
-  Schema.method( 'addUser', addUser );
-  return Schema;
+  schema.method( 'lock', lock );
+  schema.method( 'addUser', addUser );
+  
+  return schema;
 
 }
 

@@ -19,6 +19,10 @@ var crypto = require('crypto');
 
 module.exports = function UserModel( caminio, mongoose ){
 
+
+  var ObjectId = mongoose.Schema.Types.ObjectId
+    , Mixed = mongoose.Schema.Types.Mixed;
+
   //var MessageSchema = require('./_schemas/message.schema.js')( caminio, mongoose );
 
   /**
@@ -26,7 +30,7 @@ module.exports = function UserModel( caminio, mongoose ){
    * @constructor
    *
    **/
-  var Schema = new mongoose.Schema({
+  var schema = new mongoose.Schema({
         name: {
           first: String,
           last: String,
@@ -34,7 +38,7 @@ module.exports = function UserModel( caminio, mongoose ){
         },
         encrypted_password: {type: String, required: true},
         salt: {type: String, required: true},
-        preferences: { type: mongoose.Schema.Types.Mixed, default: {} },
+        preferences: { type: Mixed, default: {} },
         //messages: [ MessageSchema ],
         lang: { type: String, default: 'en' },
         email: { type: String, 
@@ -42,8 +46,8 @@ module.exports = function UserModel( caminio, mongoose ){
                  required: true,
                  index: { unique: true },
                  validate: [EmailValidator, 'invalid email address'] },
-        groups: [ { type: mongoose.Schema.Types.ObjectId, ref: 'Group' } ],
-        domains: [ { type: mongoose.Schema.Types.ObjectId, ref: 'Domain' } ],
+        groups: [ { type: ObjectId, ref: 'Group' } ],
+        domains: [ { type: ObjectId, ref: 'Domain' } ],
         confirmation: {
           key: String,
           expires: Date,
@@ -58,15 +62,15 @@ module.exports = function UserModel( caminio, mongoose ){
         last_request_at: Date,
         created: { 
           at: { type: Date, default: Date.now },
-          by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+          by: { type: ObjectId, ref: 'User' }
         },
         updated: { 
           at: { type: Date, default: Date.now },
-          by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+          by: { type: ObjectId, ref: 'User' }
         },
         locked: { 
           at: { type: Date },
-          by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+          by: { type: ObjectId, ref: 'User' }
         },
         description: String,
         billing_information: {
@@ -104,7 +108,7 @@ module.exports = function UserModel( caminio, mongoose ){
    *    > Henry King
    *
    **/
-  Schema.virtual('name.full')
+  schema.virtual('name.full')
     .get( getUserFullName )
     .set( function( name ){
       if( name.split(' ') ){
@@ -120,7 +124,7 @@ module.exports = function UserModel( caminio, mongoose ){
    * @method unread_messages
    *
    **/
-  Schema.virtual('unread_messages')
+  schema.virtual('unread_messages')
     .get( function(){
       var unread = 0;
       this.messages.forEach( function( message ){
@@ -145,7 +149,7 @@ module.exports = function UserModel( caminio, mongoose ){
    *     user.password('test');
    *
   **/
-  Schema.virtual('password')
+  schema.virtual('password')
     .set(function( password ) {
       this._password = password;
       this.salt = this.generateSalt();
@@ -165,7 +169,7 @@ module.exports = function UserModel( caminio, mongoose ){
   will be hase-compared against the original password saved to
   the database
   **/
-  Schema.method('authenticate', function(plainTextPassword) {
+  schema.method('authenticate', function(plainTextPassword) {
     return this.encryptPassword(plainTextPassword) === this.encrypted_password;
   });
 
@@ -179,7 +183,7 @@ module.exports = function UserModel( caminio, mongoose ){
     @param {String} ip address of user
 
   **/
-  Schema.method('regenerateAuthToken', function(ipAddress) {
+  schema.method('regenerateAuthToken', function(ipAddress) {
     this.auth_token.token = this.encryptPassword(ipAddress);
     this.auth_token.ip_address = ipAddress;
     this.auth_token.at = new Date();
@@ -193,7 +197,7 @@ module.exports = function UserModel( caminio, mongoose ){
     @method generateSalt
     @private
   **/
-  Schema.method('generateSalt', function() {
+  schema.method('generateSalt', function() {
     return Math.round((new Date().valueOf() * Math.random())) + '';
   });
 
@@ -204,7 +208,7 @@ module.exports = function UserModel( caminio, mongoose ){
     @param {String} password - clear text password string
   to be encrypted
   **/
-  Schema.method('encryptPassword', function(password) {
+  schema.method('encryptPassword', function(password) {
     return crypto.createHmac('sha256WithRSAEncryption', this.salt).update(password).digest('hex');
   });
 
@@ -217,7 +221,7 @@ module.exports = function UserModel( caminio, mongoose ){
     @param {Domain|Group|ObjectId|String} groupOrDomain [optional] domain or group object, ObjectId of group/domain object or string of group/domain object id
     @return {Boolean} if the user is admin
   **/
-  Schema.method('isAdmin', function(groupOrDomain){
+  schema.method('isAdmin', function(groupOrDomain){
     if( this.isSuperUser() )
       return true;
     if( groupOrDomain instanceof orm.models.Domain )
@@ -225,13 +229,13 @@ module.exports = function UserModel( caminio, mongoose ){
     return this.role <= 5;
   });
 
-  Schema.virtual('admin').get(function(){
+  schema.virtual('admin').get(function(){
     if( this.isSuperUser() )
       return true;
     return this.role <= 5;
   });
 
-  Schema.virtual('superuser').get(function(){
+  schema.virtual('superuser').get(function(){
     return this.isSuperUser();
   });
 
@@ -253,7 +257,7 @@ module.exports = function UserModel( caminio, mongoose ){
       ...
 
   **/
-  Schema.method('isSuperUser', function(){
+  schema.method('isSuperUser', function(){
     return caminio.app.config.superusers.indexOf(this.email) >= 0;
   });
 
@@ -292,6 +296,6 @@ module.exports = function UserModel( caminio, mongoose ){
     return val.match(/@/);
   }
 
-  return Schema;
+  return schema;
 
 }

@@ -2,7 +2,8 @@
  * caminio test helper
  */
 
-var async = require('async');
+var superagent = require('superagent')
+  , async = require('async');
 
 process.env['NODE_ENV'] = 'test';
 
@@ -44,7 +45,7 @@ helper.initApp = function( test, done ){
 }
 
 helper.agent = function(){
-  return require('superagent').agent();
+  return superagent.agent();
 }
 
 helper.cleanup = function( caminio, done ){

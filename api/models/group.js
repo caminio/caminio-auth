@@ -16,22 +16,24 @@
  
 module.exports = function GroupModel( caminio, mongoose ){
 
-  var Schema = mongoose.Schema({
+  var ObjectId = mongoose.Schema.Types.ObjectId;
+
+  var schema = mongoose.Schema({
       name: { type: String, required: true },
-      users: [ { type: mongoose.Schema.Types.ObjectId, ref: 'User' } ],
+      users: [ { type: ObjectId, ref: 'User' } ],
       //messages: [ MessageSchema ],
-      domains: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Domain' } ],
+      domains: [{ type: ObjectId, ref: 'Domain' } ],
       created: { 
         at: { type: Date, default: Date.now },
-        by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+        by: { type: ObjectId, ref: 'User' }
       },
       updated: { 
         at: { type: Date, default: Date.now },
-        by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+        by: { type: ObjectId, ref: 'User' }
       },
       description: String,
   });
 
-  return Schema;
+  return schema;
 
 }

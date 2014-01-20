@@ -88,4 +88,28 @@ describe('Auth integration', function(){
 
   });
 
+  describe('GET /logout', function(){
+
+    before( function(done){
+      var test = this;
+      test.agent.post( helper.url+'/login' )
+      .send({ username: user.email, password: user.password })
+      .end(function(err,res){
+        done();
+      });
+    });
+
+    it('successfully logs the user off', function(done){
+      var test = this;
+      test.agent.get( helper.url+'/logout' )
+      .end(function(err,res){
+        expect(err).to.be.null;
+        expect(res.text).to.match(/type="password"/);
+        expect(res.status).to.eq(200);
+        done();
+      });
+    });
+
+  });
+
 });

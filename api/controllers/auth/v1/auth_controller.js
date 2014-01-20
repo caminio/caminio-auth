@@ -17,7 +17,7 @@ module.exports = function AuthController( caminio, policies, middleware ){
     'do_login': [
       resetSession,
       passport.authenticate('local', { 
-        successReturnToOrRedirect: '/caminio', 
+        successReturnToOrRedirect: caminio.config.session.redirectUrl || '/caminio',
         failureRedirect: '/login',
         failureFlash: true 
       })],
@@ -25,6 +25,13 @@ module.exports = function AuthController( caminio, policies, middleware ){
     'login': 
       function( req, res ){
         res.caminio.render();
+      },
+
+    'logout':
+      function( req, res ){
+        req.logout();
+        req.session.currentDomainId = null;
+        res.redirect('/');
       }
   }
 
