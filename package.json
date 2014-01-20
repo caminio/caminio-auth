@@ -16,6 +16,7 @@
     "passport-local": "~0.1.6"
   },
   "devDependencies": {
+    "caminio": "git://github.com/tastenwerk/caminio#1.99.1",
     "caminio-fixtures": "git://github.com/tastenwerk/caminio-fixtures#0.1.1",
     "mocha": "~1.15.1",
     "chai": "~1.8.1",

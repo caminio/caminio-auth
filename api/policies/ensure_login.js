@@ -12,9 +12,8 @@ module.exports = function( caminio ){
 
   return function ensureLogin(req, res, next) {
     if (!req.isAuthenticated || !req.isAuthenticated()) {
-      if (setReturnTo && req.session)
-        req.session.returnTo = req.originalUrl || req.url;
-      return res.redirect(url);
+      req.session.returnTo = req.originalUrl || req.url;
+      return res.redirect('/login');
     }
     next();
   }

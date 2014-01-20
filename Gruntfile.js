@@ -33,7 +33,7 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('testApi', 'runs only api tests', function(){
-    grunt.config('mochaTest.test.src', ['test/**/*.api.test.js']);
+    grunt.config('mochaTest.test.src', ['test/**/*.api.integration.test.js']);
     grunt.task.run('mochaTest');
   });
 

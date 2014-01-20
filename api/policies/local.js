@@ -13,10 +13,6 @@ var passport = require('passport')
 
 module.exports = function( caminio ){
 
-
-  caminio.express.use( passport.initialize() );
-  caminio.express.use( passport.session() );
-
   /**
    * LocalStrategy
    *
@@ -38,25 +34,6 @@ module.exports = function( caminio ){
       });
     }
   ));
-
-  passport.serializeUser(function(user, done) {
-    done(null, user.id);
-  });
-
-  passport.deserializeUser(function(id, done) {
-    caminio.models.User.findOne({ _id: id }).exec( function(err, user ){
-      if( err ){ return done( err ); }
-      if( user ){
-        if( !user.last_request_at || user.last_request_at.getTime() < (new Date()) - ( caminio.config.session.timeout ) )
-          return done( null, null );
-        user.update({ last_request_at: new Date() }, function( err ){
-          done( err, user );
-        })
-      } else {
-        done( err, user );
-      }
-    });
-  });
 
   return null;
 

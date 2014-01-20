@@ -18,6 +18,8 @@ helper.initApp = function( test, done ){
     return done();
 
   helper.caminio = require('caminio');
+  var Gear = helper.Gear = require('caminio/gear');
+  new Gear({ api: true, absolutePath: __dirname+'/support/app' });
 
   // require this gear
   require('../');
