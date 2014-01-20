@@ -23,7 +23,8 @@
     "superagent": "~0.15.7",
     "grunt": "~0.4.2",
     "grunt-mocha-test": "~0.8.2",
-    "mongoose": "~3.8.4"
+    "mongoose": "~3.8.4",
+    "async": "~0.2.9"
   },
   "main": "lib/caminio.js",
   "scripts": {

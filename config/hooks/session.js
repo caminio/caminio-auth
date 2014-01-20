@@ -12,9 +12,9 @@ var passport = require('passport');
 
 module.exports = function( caminio ){
 
-  caminio.hooks.define( 'after', 'session', 'setupPassport', beforeSession );
+  caminio.hooks.define( 'after', 'session', 'setupPassport', afterSession );
 
-  function beforeSession( cb ){
+  function afterSession( cb ){
   
     caminio.express.use( passport.initialize() );
     caminio.express.use( passport.session() );

@@ -20,16 +20,48 @@ describe('Auth integration', function(){
   before( function(done){
     helper.initApp( this, function(){ 
       caminio = helper.caminio;
-      caminio.models.User.create( fixtures.User.attributes(), function( err, u ){
-        user = u;
-        done(); 
-      })
+      helper.cleanup( caminio, function(){
+        caminio.models.User.create({ email: 'test@example.com', password: 'test' }, function( err, u ){ user = u; done(); });
+        /*caminio.models.User.create( fixtures.User.attributes(), function( err, u ){
+          user = u;
+          done(); 
+        })
+*/
+      });
     });
+  });
+
+  describe('/login', function(){
+
+    it('GET form', function(done){
+      request.get( helper.url+'/login' )
+      .end(function(err,res){
+        expect(err).to.be.null;
+        expect(res.text).to.match(/type="password"/);
+        expect(res.status).to.eq(200);
+        done();
+      });
+    });
+
+    it('POST authenticates', function(done){
+      var test = this;
+      test.agent.post( helper.url+'/login' )
+      .send({ username: user.email, password: user.password })
+      .end(function(err,res){
+        expect(err).to.be.null;
+        expect(res.status).to.eq(200);
+        expect(res.text).to.match(/caminio dashboard/);
+        done();
+      });
+    });
+
   });
 
   describe('GET /caminio', function(){
 
     it('redirects to login if unauth', function(done){
+      var test = this;
+      test.agent = helper.agent();
       request.get( helper.url+'/caminio' )
       .end(function(err,res){
         expect(err).to.be.null;
@@ -38,17 +70,19 @@ describe('Auth integration', function(){
         done();
       });
     });
-  });
 
-  describe('POST /login', function(){
-
-    it('authenticates', function(done){
-      request.post( helper.url+'/do_login' )
+    it('shows page if logged in', function(done){
+      var test = this;
+      test.agent.post( helper.url+'/login' )
       .send({ username: user.email, password: user.password })
       .end(function(err,res){
-        expect(err).to.be.null;
-        expect(res.status).to.eq(200);
-        done();
+        test.agent.get( helper.url+'/caminio' )
+        .end(function(err,res){
+          expect(err).to.be.null;
+          expect(res.text).to.match(/caminio dashboard/);
+          expect(res.status).to.eq(200);
+          done();
+        });
       });
     });
 

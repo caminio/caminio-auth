@@ -2,6 +2,8 @@
  * caminio test helper
  */
 
+var async = require('async');
+
 process.env['NODE_ENV'] = 'test';
 
 var helper = {};
@@ -35,8 +37,20 @@ helper.initApp = function( test, done ){
 
   helper.url = 'http://localhost:'+helper.caminio.config.port;
 
+  test.agent = helper.agent();
+
   helper.caminio.on('ready', done);
 
+}
+
+helper.agent = function(){
+  return require('superagent').agent();
+}
+
+helper.cleanup = function( caminio, done ){
+  async.each( Object.keys(caminio.models), function( modelId, next ){
+    caminio.models[modelId].remove({}, next);
+  }, done );
 }
 
 module.exports = helper;

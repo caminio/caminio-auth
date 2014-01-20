@@ -11,6 +11,7 @@ module.exports = function(grunt) {
           globals: ['should'],
           timeout: 3000,
           ignoreLeaks: false,
+          bail: true,
           ui: 'bdd',
           reporter: 'spec'
         }

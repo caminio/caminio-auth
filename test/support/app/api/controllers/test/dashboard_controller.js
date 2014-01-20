@@ -15,7 +15,7 @@ module.exports = function DashboardController( caminio, policies, middleware ){
     'index':[
       policies.ensureLogin, 
       function( req, res ){
-        res.send('dashboard');
+        res.send('caminio dashboard');
       }]
   }
 
