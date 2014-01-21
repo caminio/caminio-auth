@@ -47,6 +47,7 @@ module.exports = function TokenModel( caminio, mongoose ){
   schema.path('token').default( function(){ return util.uid(64); } );
   schema.path('expires.at').default( function(){ return new Date() + caminio.config.token.timeout; } );
 
+  schema.publicAttributes = ['secret','client','expires','token'];
   return schema;
 
 }

@@ -65,10 +65,13 @@ describe('OpenAuth2 integration', function(){
     });
 
     it('with token', function(done){
+      var test = this;
       this.agent
       .get( helper.url+'/w_token' )
       .set( 'Authorization', 'Bearer '+this.token.token )
       .end(function(err,res){
+        console.log( test.token )
+        console.log(res.text);
         expect(res.status).to.eq(200);
         expect(res.text).to.match(/caminio token dashboard/);
         done();
