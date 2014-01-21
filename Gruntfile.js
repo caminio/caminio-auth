@@ -25,7 +25,7 @@ module.exports = function(grunt) {
   //grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-mocha-test');
 
-  grunt.registerTask('testAll', 'runs all tests', function(){
+  grunt.registerTask('test', 'runs all tests', function(){
     grunt.task.run('clearLogs');
     grunt.config('mochaTest.test.src', ['test/**/*.test.js']);
     grunt.task.run('mochaTest');
@@ -55,6 +55,6 @@ module.exports = function(grunt) {
   });
 
   // Default task(s).
-  grunt.registerTask('default', ['testAll']);
+  grunt.registerTask('default', ['test']);
 
 };
