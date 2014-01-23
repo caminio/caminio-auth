@@ -22,7 +22,8 @@ module.exports = function( caminio ){
    */
   passport.use('local', new LocalStrategy(
     function(username, password, done) {
-      caminio.models.User.findOne({ email: username }).exec( function( err, user ){
+      caminio.models.User.findOne({ email: username })
+      .exec( function( err, user ){
         if( err ){ caminio.logger.error(err); return done(err); }
         if( !user ){ return done(null, false, { message: 'user_unknown' }); }
         if( !user.authenticate( password ) )

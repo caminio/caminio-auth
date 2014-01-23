@@ -29,7 +29,9 @@ module.exports = function( caminio ){
     }
 
     function deserialize( id, done ){
-      caminio.models.User.findOne({ _id: id }).exec( function(err, user ){
+      caminio.models.User.findOne({ _id: id })
+      .populate('domains')
+      .exec( function(err, user ){
         if( err ){ return done( err ); }
         if( user ){
           if( !user.last_request_at || user.last_request_at.getTime() < (new Date()) - ( caminio.config.session.timeout ) )

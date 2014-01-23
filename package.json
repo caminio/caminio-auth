@@ -16,7 +16,8 @@
     "passport-local": "~0.1.6",
     "passport-http-bearer": "~1.0.1",
     "passport-oauth2-client-password": "~0.1.1",
-    "passport-http": "~0.2.2"
+    "passport-http": "~0.2.2",
+    "lodash": "~2.4.1"
   },
   "devDependencies": {
     "caminio": "~1.99.1",
