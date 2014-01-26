@@ -31,11 +31,8 @@ module.exports = function UserModel( caminio, mongoose ){
    *
    **/
   var schema = new mongoose.Schema({
-        name: {
-          first: String,
-          last: String,
-          nick: String
-        },
+        firstName: String,
+        lastName: String,
         encrypted_password: {type: String, required: true},
         salt: {type: String, required: true},
         preferences: { type: Mixed, default: {} },
@@ -48,30 +45,19 @@ module.exports = function UserModel( caminio, mongoose ){
                  validate: [EmailValidator, 'invalid email address'] },
         groups: [ { type: ObjectId, ref: 'Group' } ],
         domains: [ { type: ObjectId, ref: 'Domain' } ],
-        confirmation: {
-          key: String,
-          expires: Date,
-          last_success: Date,
-          tries: { type: Number, default: 3 }
-        },
+        confirmationKey: String,
+        confirmationExpires: Date,
+        confirmationTries: Number,
         role: { type: Number, default: 100 },
-        last_login: {
-          at: Date,
-          ip: String
-        },
-        last_request_at: Date,
-        created: { 
-          at: { type: Date, default: Date.now },
-          by: { type: ObjectId, ref: 'User' }
-        },
-        updated: { 
-          at: { type: Date, default: Date.now },
-          by: { type: ObjectId, ref: 'User' }
-        },
-        locked: { 
-          at: { type: Date },
-          by: { type: ObjectId, ref: 'User' }
-        },
+        lastLoginAt: Date,
+        lastLoginIp: String,
+        lastRequestAt: Date,
+        createdAt: { type: Date, default: Date.now },
+        createdBy: { type: ObjectId, ref: 'User' },
+        updatedAt: { type: Date, default: Date.now },
+        updatedBy: { type: ObjectId, ref: 'User' },
+        lockedAt: { type: Date },
+        lockedBy: { type: ObjectId, ref: 'User' },
         description: String,
         billing_information: {
           address: {
@@ -108,29 +94,14 @@ module.exports = function UserModel( caminio, mongoose ){
    *    > Henry King
    *
    **/
-  schema.virtual('name.full')
+  schema.virtual('fullName')
     .get( getUserFullName )
     .set( function( name ){
       if( name.split(' ') ){
-        this.name.first = name.split(' ')[0];
-        this.name.last = name.split(' ')[1];
+        this.firstName = name.split(' ')[0];
+        this.lastName = name.split(' ')[1];
       } else
-        this.name.first = name;
-    });
-
-  /**
-   * show the number of unread messages
-   *
-   * @method unread_messages
-   *
-   **/
-  schema.virtual('unread_messages')
-    .get( function(){
-      var unread = 0;
-      this.messages.forEach( function( message ){
-        if( !message.read ) unread+=1;
-      });
-      return unread;
+        this.firstName = name;
     });
 
   /**
@@ -258,7 +229,7 @@ module.exports = function UserModel( caminio, mongoose ){
 
   **/
   schema.method('isSuperUser', function(){
-    return caminio.app.config.superusers.indexOf(this.email) >= 0;
+    return caminio.config.superusers && caminio.config.superusers.indexOf(this.email) >= 0;
   });
 
   /**
@@ -272,14 +243,12 @@ module.exports = function UserModel( caminio, mongoose ){
    *
    **/
   function getUserFullName(){
-    if( this.name.first && this.name.last )
-      return this.name.first + ' ' + this.name.last;
-    else if( this.name.first )
-      return this.name.first;
-    else if( this.name.last )
-      return this.name.last;
-    else if( this.name.nick )
-      return this.name.nick;
+    if( this.firstName && this.lastName )
+      return this.firstName + ' ' + this.lastName;
+    else if( this.firstName )
+      return this.firstName;
+    else if( this.lastName )
+      return this.lastName;
     else
       return this.email;
   }
@@ -295,6 +264,17 @@ module.exports = function UserModel( caminio, mongoose ){
     if( !val ) return false;
     return val.match(/@/);
   }
+
+  schema.publicAttributes = [
+    'firstName',
+    'lastName',
+    'fullName',
+    'email',
+    'lastLoginAt',
+    'lastRequestAt',
+    'superupser',
+    'admin'
+  ];
 
   return schema;
 

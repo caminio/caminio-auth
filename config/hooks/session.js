@@ -34,9 +34,9 @@ module.exports = function( caminio ){
       .exec( function(err, user ){
         if( err ){ return done( err ); }
         if( user ){
-          if( !user.last_request_at || user.last_request_at.getTime() < (new Date()) - ( caminio.config.session.timeout ) )
+          if( !user.lastRequestAt || user.lastRequestAt.getTime() < (new Date()) - ( caminio.config.session.timeout ) )
             return done( null, null );
-          user.update({ last_request_at: new Date() }, function( err ){
+          user.update({ lastRequestAt: new Date() }, function( err ){
             done( err, user );
           })
         } else {

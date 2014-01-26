@@ -28,7 +28,7 @@ module.exports = function( caminio ){
         if( !user ){ return done(null, false, { message: 'user_unknown' }); }
         if( !user.authenticate( password ) )
           return done( null, false, { message: 'authentication_failed' });
-        user.update({ 'last_login.at': new Date(), last_request_at: new Date() }, function( err ){
+        user.update({ lastLoginAt: new Date(), lastRequestAt: new Date() }, function( err ){
           if( err ){ return done(err); }
           done( null, user );
         })
