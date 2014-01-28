@@ -8,7 +8,7 @@
  *
  */
 
-var crypto = require('crypto');
+module.exports = UserModel;
 
 /**
  * The user class is the main user object
@@ -17,11 +17,11 @@ var crypto = require('crypto');
  * @class User
  */
 
-module.exports = function UserModel( caminio, mongoose ){
-
-
-  var ObjectId = mongoose.Schema.Types.ObjectId
-    , Mixed = mongoose.Schema.Types.Mixed;
+function UserModel( caminio, mongoose ){
+  
+  var crypto    = require('crypto');
+  var ObjectId  = mongoose.Schema.Types.ObjectId;
+  var Mixed     = mongoose.Schema.Types.Mixed;
 
   //var MessageSchema = require('./_schemas/message.schema.js')( caminio, mongoose );
 
@@ -272,7 +272,7 @@ module.exports = function UserModel( caminio, mongoose ){
     'email',
     'lastLoginAt',
     'lastRequestAt',
-    'superupser',
+    'superuser',
     'admin'
   ];
 
