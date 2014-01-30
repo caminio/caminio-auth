@@ -112,7 +112,7 @@ module.exports = function GroupModel( caminio, mongoose ){
     
     if( this._allowedArr ) return this._allowedArr;
 
-    available = {};
+    var available = {};
     _.each( caminio.gears, function( gear ){
       _.each( gear.applications, function( appDef ){
         var buildAppDef = { name: appDef.name };
