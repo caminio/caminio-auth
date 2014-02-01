@@ -13,7 +13,7 @@ module.exports = function( caminio ){
   return function ensureLogin(req, res, next) {
     if (!req.isAuthenticated || !req.isAuthenticated()) {
       req.session.returnTo = req.originalUrl || req.url;
-      return res.redirect('/login');
+      return res.redirect('/caminio/login');
     }
     next();
   }

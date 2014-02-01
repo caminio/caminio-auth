@@ -22,7 +22,7 @@ module.exports = function AuthController( caminio, policies, middleware ){
       resetSession,
       passport.authenticate('local', { 
         successReturnToOrRedirect: caminio.config.session.redirectUrl || '/caminio',
-        failureRedirect: '/login',
+        failureRedirect: '/caminio/login',
         failureFlash: true
       })],
 
@@ -54,15 +54,16 @@ module.exports = function AuthController( caminio, policies, middleware ){
 
     'do_reset_password': [
       findUser,
+      generateConfirmationUrl,
       sendPassword,
       //reportErrors,
       function( req, res ){
         if( !req.sentOK ){
           req.flash('error', req.i18n.t('auth.unknown_email', { email: req.param('email') }));
-          res.redirect('/reset_password');
+          res.redirect('/caminio/reset_password');
         } else {
           req.flash('info', req.i18n.t('auth.link_has_been_sent', { email: req.param('email') }));
-          res.redirect('/login');
+          res.redirect('/caminio/login');
         }
       }],
 
@@ -92,7 +93,7 @@ module.exports = function AuthController( caminio, policies, middleware ){
       if( err ){ next(err); }
       if( count > 0 ){
         req.flash('error', req.i18n.t('setup.already_initialized'));
-        return res.redirect('/login');
+        return res.redirect('/caminio/login');
       }
       next();
     });
@@ -130,7 +131,7 @@ module.exports = function AuthController( caminio, policies, middleware ){
       });
     } else {
       req.flash('error', req.i18n.t('setup.fill_in_all_fields'));
-      res.redirect('/caminio_setup');
+      res.redirect('/caminio/initial_setup');
       next();
     }
   }
@@ -157,6 +158,19 @@ module.exports = function AuthController( caminio, policies, middleware ){
   }
 
   /**
+   * generate a url the user will be sent in the email
+   * to reset the password
+   */
+  function generateConfirmationUrl( req, res, next ){
+    if( !req.user ){ return next(); }
+    req.user.generateConfirmationKey();
+    req.user.save( function( err ){
+      if( err ){ return next(err); }
+      next();
+    });
+  }
+
+  /**
    * sends the password to the user
    */
   function sendPassword( req, res, next ){
@@ -166,7 +180,10 @@ module.exports = function AuthController( caminio, policies, middleware ){
       req.i18n.t('auth.mailer.subject_reset_password'), 
       'auth/reset_password', 
       { 
-        locals: { user: req.user } 
+        locals: { 
+          user: req.user,
+          url: (req.protocol + "://" + req.get('host') + '/caminio/accounts/' + req.user.id + '/reset/' + req.user.confirmation.key)
+        } 
       },
       function( err ){
         req.sentOK = true;

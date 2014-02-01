@@ -36,7 +36,7 @@ helper.initApp = function( test, done ){
     }
   });
 
-  helper.url = 'http://localhost:'+helper.caminio.config.port;
+  helper.url = 'http://localhost:'+helper.caminio.config.port+'/caminio';
 
   test.agent = helper.agent();
 

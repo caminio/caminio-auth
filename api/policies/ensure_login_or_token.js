@@ -21,7 +21,7 @@ module.exports = function( caminio ){
       if( 'authorization' in req.headers )
         return ensureToken( req, res, next );
       
-      return res.redirect('/login');
+      return res.redirect('/caminio/login');
 
     }
 

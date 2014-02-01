@@ -5,17 +5,21 @@
 
 module.exports.routes = {
 
-  '/login': 'Auth::V1::AuthController#login',
-  'POST /login': 'Auth::V1::AuthController#do_login',
+  '/caminio/login': 'Auth::V1::AuthController#login',
+  'POST /caminio/login': 'Auth::V1::AuthController#do_login',
 
-  '/reset_password': 'Auth::V1::AuthController#reset_password',
-  'POST /reset_password': 'Auth::V1::AuthController#do_reset_password',
+  '/caminio/reset_password': 'Auth::V1::AuthController#reset_password',
+  'POST /caminio/reset_password': 'Auth::V1::AuthController#do_reset_password',
 
-  '/caminio_setup': 'Auth::V1::AuthController#setup',
-  'POST /caminio_setup': 'Auth::V1::AuthController#do_setup',
+  'GET /caminio/accounts/:id/reset/:key': 'Users#reset',
+  'POST /caminio/accounts/:id/reset/:key': 'Users#do_reset',
+  'autorest /caminio/accounts': 'User',
 
-  '/logout': 'Auth::V1::AuthController#logout',
+  '/caminio/initial_setup': 'Auth::V1::AuthController#setup',
+  'POST /caminio/initial_setup': 'Auth::V1::AuthController#do_setup',
 
-  'POST /oauth/request_token': 'Auth::V1::OAuthController#request_token'
+  '/caminio/logout': 'Auth::V1::AuthController#logout',
+
+  'POST /caminio/oauth/request_token': 'Auth::V1::OAuthController#request_token'
 
 };

@@ -48,6 +48,8 @@ describe('Auth integration', function(){
       test.agent.post( helper.url+'/login' )
       .send({ username: user.email, password: user.password })
       .end(function(err,res){
+        console.log('routes');
+        console.log(caminio.controller.routes());
         expect(err).to.be.null;
         expect(res.status).to.eq(200);
         expect(res.text).to.match(/caminio dashboard/);
@@ -62,7 +64,7 @@ describe('Auth integration', function(){
     it('redirects to login if unauth', function(done){
       var test = this;
       test.agent = helper.agent();
-      request.get( helper.url+'/caminio' )
+      request.get( helper.url )
       .end(function(err,res){
         expect(err).to.be.null;
         expect(res.text).to.match(/type="password"/);
@@ -76,7 +78,7 @@ describe('Auth integration', function(){
       test.agent.post( helper.url+'/login' )
       .send({ username: user.email, password: user.password })
       .end(function(err,res){
-        test.agent.get( helper.url+'/caminio' )
+        test.agent.get( helper.url )
         .end(function(err,res){
           expect(err).to.be.null;
           expect(res.text).to.match(/caminio dashboard/);

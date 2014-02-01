@@ -57,7 +57,7 @@ describe('OpenAuth2 integration', function(){
 
     it('without token', function(done){
       helper.agent()
-      .get( helper.url+'/w_token' )
+      .get( helper.url.replace('/caminio','')+'/w_token' )
       .end(function(err,res){
         expect(res.status).to.eq(403);
         done();
@@ -67,7 +67,7 @@ describe('OpenAuth2 integration', function(){
     it('with token', function(done){
       var test = this;
       this.agent
-      .get( helper.url+'/w_token' )
+      .get( helper.url.replace('/caminio','')+'/w_token' )
       .set( 'Authorization', 'Bearer '+this.token.token )
       .end(function(err,res){
         console.log( test.token )
@@ -97,7 +97,7 @@ describe('OpenAuth2 integration', function(){
     
       it('redirects to html login form if no Authorization in header', function(done){
         helper.agent()
-        .get( helper.url+'/w_login_or_token' )
+        .get( helper.url.replace('/caminio','')+'/w_login_or_token' )
         .end(function(err,res){
           expect(res.status).to.eq(200);
           expect(res.text).to.match(/type="password"/);
@@ -107,7 +107,7 @@ describe('OpenAuth2 integration', function(){
 
       it('forbidden', function(done){
         helper.agent()
-        .get( helper.url+'/w_login_or_token' )
+        .get( helper.url.replace('/caminio','')+'/w_login_or_token' )
         .set( 'Authorization', 'Bearer 123' )
         .end(function(err,res){
           expect(res.status).to.eq(403);
@@ -117,7 +117,7 @@ describe('OpenAuth2 integration', function(){
 
       it('with token', function(done){
         this.agent
-        .get( helper.url+'/w_login_or_token' )
+        .get( helper.url.replace('/caminio','')+'/w_login_or_token' )
         .set( 'Authorization', 'Bearer '+this.token.token )
         .end(function(err,res){
           expect(res.status).to.eq(200);
@@ -132,7 +132,7 @@ describe('OpenAuth2 integration', function(){
 
       it('redirects to login', function(done){
         helper.agent()
-        .get( helper.url+'/w_login_or_token' )
+        .get( helper.url.replace('/caminio','')+'/w_login_or_token' )
         .end(function(err,res){
           expect(err).to.be.null;
           expect(res.text).to.match(/type="password"/);
@@ -147,7 +147,7 @@ describe('OpenAuth2 integration', function(){
         .post( helper.url+'/login' )
         .send({ username: test.user.email, password: test.user.password })
         .end(function(err,res){
-          agent.get( helper.url+'/w_login_or_token' )
+          agent.get( helper.url.replace('/caminio','')+'/w_login_or_token' )
           .end(function(err,res){
             expect(err).to.be.null;
             expect(res.status).to.eq(200);
@@ -178,7 +178,7 @@ describe('OpenAuth2 integration', function(){
 
     it('fails', function(done){
       helper.agent()
-      .get( helper.url+'/w_token' )
+      .get( helper.url.replace('/caminio','')+'/w_token' )
       .end(function(err,res){
         expect(res.status).to.eq(403);
         done();

@@ -10,6 +10,7 @@
 
 module.exports = UserModel;
 
+
 /**
  * The user class is the main user object
  * for any operations in caminio
@@ -19,9 +20,10 @@ module.exports = UserModel;
 
 function UserModel( caminio, mongoose ){
   
-  var crypto    = require('crypto');
-  var ObjectId  = mongoose.Schema.Types.ObjectId;
-  var Mixed     = mongoose.Schema.Types.Mixed;
+  var crypto      = require('crypto');
+  var ObjectId    = mongoose.Schema.Types.ObjectId;
+  var Mixed       = mongoose.Schema.Types.Mixed;
+  var caminioUtil = require('caminio/util');
 
   //var MessageSchema = require('./_schemas/message.schema.js')( caminio, mongoose );
 
@@ -45,9 +47,11 @@ function UserModel( caminio, mongoose ){
                  validate: [EmailValidator, 'invalid email address'] },
         groups: [ { type: ObjectId, ref: 'Group' } ],
         domains: [ { type: ObjectId, ref: 'Domain' } ],
-        confirmationKey: String,
-        confirmationExpires: Date,
-        confirmationTries: Number,
+        confirmation: {
+          key: String,
+          expires: Date,
+          tries: Number
+        },
         role: { type: Number, default: 100 },
         lastLoginAt: Date,
         lastLoginIp: String,
@@ -59,7 +63,7 @@ function UserModel( caminio, mongoose ){
         lockedAt: { type: Date },
         lockedBy: { type: ObjectId, ref: 'User' },
         description: String,
-        billing_information: {
+        billingInformation: {
           address: {
             street: String,
             zip: String,
@@ -80,7 +84,7 @@ function UserModel( caminio, mongoose ){
   });
 
   /**
-   * name.full virtual
+   * fullName virtual
    *
    * constructs a string which is definitely not null
    * and represents a (not unique) name of this user
@@ -145,19 +149,14 @@ function UserModel( caminio, mongoose ){
   });
 
   /**
-  regenerateAuthToken
-
-  regenerates the auth_token object by generating a
-  new random hash and updating ip address of user
-
-    @method regenerateAuthToken
-    @param {String} ip address of user
-
-  **/
-  schema.method('regenerateAuthToken', function(ipAddress) {
-    this.auth_token.token = this.encryptPassword(ipAddress);
-    this.auth_token.ip_address = ipAddress;
-    this.auth_token.at = new Date();
+   * generate a new confirmation key
+   *
+   * @method generateConfirmationKey
+   */
+  schema.method('generateConfirmationKey', function() {
+    this.confirmation.key = caminioUtil.uid(8);
+    this.confirmation.expires = new Date();
+    this.confirmation.tries += 1;
   });
 
   /**
