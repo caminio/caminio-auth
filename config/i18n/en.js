@@ -4,11 +4,15 @@ module.exports = function( t ){
   t.auth.title = 'Login required';
   t.auth.email_address = 'Email address';
   t.auth.password = 'Your password';
+  t.auth.confirm_password = 'Re-enter password';
+  t.auth.enter_new_password = 'Enter your new password';
+  t.auth.confirmation_missmatch = 'Confirmation key missmatch';
   t.back_to_login = 'Back to login';
   t.auth.unknown_email = 'The email address __email__ is not known to this system.';
   t.auth.mailer = t.auth.mailer || {};
   t.auth.mailer.subject_reset_password = 'Reset password request';
   t.auth.link_has_been_sent = 'An email has been sent to __email__. Please check your inbox';
+  t.auth.security_transgression = 'Fatal security transgression!';
 
   t.setup = t.setup || {};
   t.setup.title = 'Initial setup';
@@ -35,5 +39,11 @@ module.exports = function( t ){
   t.authentication_failed = 'Login failed!';
   t.toggle_sidebar = 'Toggle sidebar';
   t.logout = 'Logout';
+
+  t.user = t.user || {};
+  t.user.password_saved = 'Your new password has been saved';
+  t.user.errors = t.user.errors || {};
+  t.user.errors.too_short = 'The entered password is too short (6 characters at least)';
+  t.user.errors.requirements_not_met = 'The password must contain at least one digit, at least one lower case character, at least one uppercase character';
 
 };

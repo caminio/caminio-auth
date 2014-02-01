@@ -155,8 +155,24 @@ function UserModel( caminio, mongoose ){
    */
   schema.method('generateConfirmationKey', function() {
     this.confirmation.key = caminioUtil.uid(8);
-    this.confirmation.expires = new Date();
+    this.confirmation.expires = new Date()+1800*1000;
     this.confirmation.tries += 1;
+  });
+
+  /**
+   * returns if password meets requirements
+   *
+   * @method checkPassword
+   */
+  schema.method('checkPassword', function(pwd, confirm_pwd){
+    if( !pwd || pwd.length < 6 )
+      return [ false, 'too_short' ];
+    if( confirm_pwd && confirm_pwd !== pwd )
+      return [ false, 'confirmation_missmatch' ];
+    //if( !pwd.match(/[A-Z]+[a-z]+[0-9]+[\D]+/) )
+    if( !pwd.match(/[A-Z]+[a-z]+[0-9]+/) )
+      return [ false, 'requirements_not_met' ];
+    return [ true ];
   });
 
   /**

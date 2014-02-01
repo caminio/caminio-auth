@@ -28,7 +28,7 @@ module.exports = function AuthController( caminio, policies, middleware ){
 
     'setup': [
       checkInitialSetup,
-      processFlash,
+      middleware.processFlash,
       function( req, res ){
         res.caminio.render();
       }],
@@ -41,13 +41,13 @@ module.exports = function AuthController( caminio, policies, middleware ){
       }],
 
     'login': [
-      processFlash,
+      middleware.processFlash,
       function( req, res ){
         res.caminio.render();
       }],
 
     'reset_password': [
-      processFlash,
+      middleware.processFlash,
       function( req, res ){
         res.caminio.render();
       }],
@@ -189,22 +189,6 @@ module.exports = function AuthController( caminio, policies, middleware ){
         req.sentOK = true;
         next( err );
       });
-  }
-
-  /**
-   * process messages from req.flash
-   */
-  function processFlash( req, res, next ){
-    res.locals.message = req.flash('error');
-    if( _.isEmpty(res.locals.message) )
-      res.locals.message = req.flash('info');
-    else
-      res.locals.error = true;
-    if( _.isEmpty(res.locals.message) )
-      res.locals.message = null;
-    else
-      res.locals.message = req.i18n.t(res.locals.message);
-    next();
   }
 
 };
