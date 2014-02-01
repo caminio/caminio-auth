@@ -38,7 +38,7 @@ module.exports = function( caminio ){
             return done( null, null );
           user.update({ lastRequestAt: new Date() }, function( err ){
             done( err, user );
-          })
+          });
         } else {
           done( err, user );
         }
@@ -47,4 +47,4 @@ module.exports = function( caminio ){
 
   }
 
-}
+};

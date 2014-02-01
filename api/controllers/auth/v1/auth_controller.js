@@ -8,19 +8,15 @@
  *
  */
 
-var _             = require('lodash')
-  , passport      = require('passport');
+var _             = require('lodash');
+var passport      = require('passport');
 
 module.exports = function AuthController( caminio, policies, middleware ){
 
-  var User = caminio.models.User
-    , Domain = caminio.models.Domain;
+  var User = caminio.models.User;
+  var Domain = caminio.models.Domain;
 
   return {
-
-    _before: {
-      '*': [ reportErrors ]
-    },
 
     'do_login': [
       resetSession,
@@ -32,32 +28,52 @@ module.exports = function AuthController( caminio, policies, middleware ){
 
     'setup': [
       checkInitialSetup,
+      processFlash,
       function( req, res ){
-        var msg = req.flash('error');
-        res.caminio.render({ layout: 'layouts/authorize', message: _.isEmpty(msg) ? '' : req.i18n.t(msg) });
+        res.caminio.render();
       }],
 
     'do_setup': [
       checkInitialSetup,
       doInitialSetup,
+      reportErrors,
       function( req, res ){
       }],
 
-    'login': 
+    'login': [
+      processFlash,
       function( req, res ){
-        var msg = req.flash('error');
-        if( _.isEmpty(msg) )
-          msg = req.flash('info');
-        res.caminio.render({ layout: 'layouts/authorize', message: _.isEmpty(msg) ? '' : req.i18n.t(msg) });
-      },
+        res.caminio.render();
+      }],
+
+    'reset_password': [
+      processFlash,
+      function( req, res ){
+        res.caminio.render();
+      }],
+
+    'do_reset_password': [
+      findUser,
+      sendPassword,
+      //reportErrors,
+      function( req, res ){
+        if( !req.sentOK ){
+          req.flash('error', req.i18n.t('auth.unknown_email', { email: req.param('email') }));
+          res.redirect('/reset_password');
+        } else {
+          req.flash('info', req.i18n.t('auth.link_has_been_sent', { email: req.param('email') }));
+          res.redirect('/login');
+        }
+      }],
 
     'logout':
       function( req, res ){
         req.logout();
         req.session.currentDomainId = null;
         res.redirect('/');
-      }
-  }
+      },
+
+    };
 
   /**
    * reset domain session object
@@ -105,7 +121,8 @@ module.exports = function AuthController( caminio, policies, middleware ){
 
                           if( err ) return next(err);
 
-                          req.flash('info', req.i18n.t('setup.successful'))
+                          req.flash('info', req.i18n.t('setup.successful'));
+
                           res.redirect('/login');
                           next();
                         });
@@ -123,9 +140,54 @@ module.exports = function AuthController( caminio, policies, middleware ){
    */
   function reportErrors( err, req, res, next ){
     caminio.logger.error('error occured at',req.controllerName,'#',req.actionName,':', err);
-    if( req.xhr )
+    if( req.xhr ) 
       return res.json(500, { error: err });
     return res.caminio.render('500');
   }
 
-}
+  /**
+   * finds the user by it's email address
+   */
+  function findUser( req, res, next ){
+    User.findOne({ email: req.param('email') }, function( err, user ){
+      if( err ){ return next( err ); }
+      req.user = user;
+      next();
+    });
+  }
+
+  /**
+   * sends the password to the user
+   */
+  function sendPassword( req, res, next ){
+    if( !req.user ){ return next(); }
+    caminio.mailer.send(
+      req.user.email,
+      req.i18n.t('auth.mailer.subject_reset_password'), 
+      'auth/reset_password', 
+      { 
+        locals: { user: req.user } 
+      },
+      function( err ){
+        req.sentOK = true;
+        next( err );
+      });
+  }
+
+  /**
+   * process messages from req.flash
+   */
+  function processFlash( req, res, next ){
+    res.locals.message = req.flash('error');
+    if( _.isEmpty(res.locals.message) )
+      res.locals.message = req.flash('info');
+    else
+      res.locals.error = true;
+    if( _.isEmpty(res.locals.message) )
+      res.locals.message = null;
+    else
+      res.locals.message = req.i18n.t(res.locals.message);
+    next();
+  }
+
+};

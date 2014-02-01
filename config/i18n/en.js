@@ -2,8 +2,13 @@ module.exports = function( t ){
 
   t.auth = t.auth || {};
   t.auth.title = 'Login required';
-  t.auth.email = 'Email address';
+  t.auth.email_address = 'Email address';
   t.auth.password = 'Your password';
+  t.back_to_login = 'Back to login';
+  t.auth.unknown_email = 'The email address __email__ is not known to this system.';
+  t.auth.mailer = t.auth.mailer || {};
+  t.auth.mailer.subject_reset_password = 'Reset password request';
+  t.auth.link_has_been_sent = 'An email has been sent to __email__. Please check your inbox';
 
   t.setup = t.setup || {};
   t.setup.title = 'Initial setup';
@@ -11,6 +16,7 @@ module.exports = function( t ){
   t.setup.choose_email = 'Administrator\'s email address';
   t.setup.choose_pwd = 'Administrator\'s password';
   t.setup.domain_name = 'Domain name';
+  t.setup.create = 'Create Account';
   t.setup.domain_name_desc = 'e.g.: camin.io';
   t.setup.fill_in_all_fields = 'Please fill in all fields';
   t.setup.successful = 'Setup successfully completed';
@@ -21,7 +27,7 @@ module.exports = function( t ){
   t.username_email = 'Username';
   t.password = 'Password';
   t.login = 'Login';
-  t.forgot_password = 'Forgot your password?';
+  t.forgotten_password = 'Forgotten password?';
   t.enter_email = 'Email address';
   t.remember_your_email = 'If you remember your Email address, you can request a link to reset your password.';
   t.request_link = 'Request link';
@@ -30,4 +36,4 @@ module.exports = function( t ){
   t.toggle_sidebar = 'Toggle sidebar';
   t.logout = 'Logout';
 
-}
+};
