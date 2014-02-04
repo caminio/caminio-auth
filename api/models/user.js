@@ -46,7 +46,7 @@ function UserModel( caminio, mongoose ){
                  index: { unique: true },
                  validate: [EmailValidator, 'invalid email address'] },
         groups: [ { type: ObjectId, ref: 'Group' } ],
-        domains: [ { type: ObjectId, ref: 'Domain' } ],
+        camDomains: [ { type: ObjectId, ref: 'Domain' } ],
         confirmation: {
           key: String,
           expires: Date,
@@ -162,18 +162,16 @@ function UserModel( caminio, mongoose ){
   /**
    * returns if password meets requirements
    *
+   * @method User.checkPassword
+   *
+   */
+  schema.static('checkPassword', checkPassword);
+
+  /**
+   * triggers class function to keep backward compatibility
    * @method checkPassword
    */
-  schema.method('checkPassword', function(pwd, confirm_pwd){
-    if( !pwd || pwd.length < 6 )
-      return [ false, 'too_short' ];
-    if( confirm_pwd && confirm_pwd !== pwd )
-      return [ false, 'confirmation_missmatch' ];
-    //if( !pwd.match(/[A-Z]+[a-z]+[0-9]+[\D]+/) )
-    if( !pwd.match(/[A-Z]+[a-z]+[0-9]+/) )
-      return [ false, 'requirements_not_met' ];
-    return [ true ];
-  });
+  schema.method( 'checkPassword', checkPassword );
 
   /**
   generate salt
@@ -278,6 +276,24 @@ function UserModel( caminio, mongoose ){
   function EmailValidator( val ){
     if( !val ) return false;
     return val.match(/@/);
+  }
+
+  /**
+   * checks the given password and returns an array
+   * first field: true/false
+   * second field: error message if false
+   *
+   * @method checkPassword
+   */
+  function checkPassword(pwd, confirm_pwd){
+    if( !pwd || pwd.length < 6 )
+      return [ false, 'too_short' ];
+    if( confirm_pwd && confirm_pwd !== pwd )
+      return [ false, 'confirmation_missmatch' ];
+    //if( !pwd.match(/[A-Z]+[a-z]+[0-9]+[\D]+/) )
+    if( !pwd.match(/[A-Z]+[a-z]+[0-9]+/) )
+      return [ false, 'requirements_not_met' ];
+    return [ true ];
   }
 
   schema.publicAttributes = [

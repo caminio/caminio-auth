@@ -9,6 +9,7 @@
  */
 
 var _             = require('lodash');
+var fs            = require('fs');
 var passport      = require('passport');
 
 module.exports = function AuthController( caminio, policies, middleware ){
@@ -35,12 +36,15 @@ module.exports = function AuthController( caminio, policies, middleware ){
 
     'do_setup': [
       checkInitialSetup,
-      doInitialSetup,
-      reportErrors,
+      doInitialSetupCheckBody,
+      doInitialSetupCreateOrFindDomain,
+      doInitialSetupCreateUser,
+      //reportErrors,
       function( req, res ){
       }],
 
     'login': [
+      checkInitialSetupAndRedirect,
       middleware.processFlash,
       function( req, res ){
         res.caminio.render();
@@ -70,7 +74,7 @@ module.exports = function AuthController( caminio, policies, middleware ){
     'logout':
       function( req, res ){
         req.logout();
-        req.session.currentDomainId = null;
+        req.session.currentcamDomainId = null;
         res.redirect('/');
       },
 
@@ -80,7 +84,7 @@ module.exports = function AuthController( caminio, policies, middleware ){
    * reset domain session object
    */
   function resetSession( req, res, next ){
-    req.session.domainId = null;
+    req.session.camDomainId = null;
     next();
   }
 
@@ -99,41 +103,60 @@ module.exports = function AuthController( caminio, policies, middleware ){
     });
   }
 
+  function doInitialSetupCheckBody( req, res, next ){
+    if( !_.isEmpty(req.body.email) && !_.isEmpty(req.body.password) && !_.isEmpty(req.body.camDomainName) )
+      return next();
+    req.flash('error', req.i18n.t('setup.fill_in_all_fields') );
+    res.redirect('/caminio/initial_setup');
+  }
+
+  function doInitialSetupCreateOrFindDomain( req, res, next ){
+    Domain.findOne({name: req.body.camDomainName}, function( err, domain ){
+      if( err ){ next(err); }
+      if( domain ){ 
+        req.camDomain = domain;
+        return next(); 
+      }
+      Domain.create({ name: req.body.camDomainName }, function( err, domain ){
+        if( err ) return next(err);
+        if( !domain ) return next('domain '+req.body.camDomainName+' failed to create');
+        req.camDomain = domain;
+        next();
+      });
+    });
+  }
+
   /**
    * creates domain and user accounts
    * should only be invoked after checking, that no domains nor users
    * exist
    */
-  function doInitialSetup( req, res, next ){
-    if( !_.isEmpty(req.body.username) && !_.isEmpty(req.body.password) && !_.isEmpty(req.body.domain_name) ){
-      Domain.create({ name: req.body.domain_name }, function( err, domain ){
-        
-        if( err ) return next(err);
-        if( !domain ) return next('domain '+req.body.domain_name+' failed to create');
+  function doInitialSetupCreateUser( req, res, next ){
+    if( !req.camDomain ){ return next('no domain could be found. But it should have been created.'); }
+      var check = User.checkPassword( req.body.password );
 
-        User.create({ email: req.body.username, 
-                      password: req.body.password,
-                      domains: domain }, function( err, user ){
-
-                        if( err ) return next(err);
-                        if( !user ) return next('user '+req.body.username+' failed to create');
-
-                        domain.update({ owner: user }, function( err ){
-
-                          if( err ) return next(err);
-
-                          req.flash('info', req.i18n.t('setup.successful'));
-
-                          res.redirect('/login');
-                          next();
-                        });
-                      });
-      });
-    } else {
-      req.flash('error', req.i18n.t('setup.fill_in_all_fields'));
-      res.redirect('/caminio/initial_setup');
-      next();
+    if( !check[0] ){
+      req.flash('error', req.i18n.t('user.errors.'+check[1]));
+      return res.redirect('/caminio/initial_setup');
     }
+
+    User.create({ email: req.body.email, 
+                  password: req.body.password,
+                  camDomains: [ req.camDomain ] }, function( err, user ){
+
+                    if( err ) return next(err);
+                    if( !user ) return next('user '+req.body.email+' failed to create');
+
+                    req.camDomain.update({ owner: user }, function( err ){
+
+                      if( err ) return next(err);
+
+                      req.flash('info', req.i18n.t('setup.successful'));
+
+                      res.redirect('/caminio/login');
+                      next();
+                    });
+    });
   }
 
   /**
@@ -189,6 +212,24 @@ module.exports = function AuthController( caminio, policies, middleware ){
         req.sentOK = true;
         next( err );
       });
+  }
+
+  /**
+   * checks if this is the first run of caminio
+   * and redirect to caminio/initial_setup if no user
+   * account was found
+   *
+   */
+  function checkInitialSetupAndRedirect( req, res, next ){
+    if( caminio.config.superusers && caminio.config.superusers.length > 0 )
+      return next();
+    User.count( function( err, count ){
+      if( err ){ caminio.logger.error('unknown error occured:', err); }
+      if( count > 0 ){ return next(); }
+      req.flash( 'info', req.i18n.t('setup.desc') );
+      // seems we haven't got any user in the system.
+      res.redirect('/caminio/initial_setup');
+    });
   }
 
 };

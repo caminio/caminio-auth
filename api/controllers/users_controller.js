@@ -72,7 +72,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
     req.user.save( function( err ){
       if( err ){ return next(err); }
       req.user.populate('domains', function(err,user){
-        user.domains.forEach( function(domain){
+        user.camDomains.forEach( function(domain){
           caminio.audit.log( domain.name, 
             'password has been changed for user',req.user.id,
             ' (',req.user.fullName,') IP:',

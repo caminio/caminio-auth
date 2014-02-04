@@ -30,7 +30,7 @@ module.exports = function( caminio ){
 
     function deserialize( id, done ){
       caminio.models.User.findOne({ _id: id })
-      .populate('domains')
+      .populate('camDomains')
       .exec( function(err, user ){
         if( err ){ return done( err ); }
         if( user ){

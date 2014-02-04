@@ -22,15 +22,15 @@ module.exports = function( caminio ){
   function addCurrentUserAndDomain( req, res, next ){
     if( !req.user ){ return next(); }
     res.locals.currentUser = req.user;
-    if( !req.session.domainId && req.user.domains.length > 0 )
-      req.session.domainId = req.user.domains[0].id;
+    if( !req.session.camDomainId && req.user.camDomains.length > 0 )
+      req.session.camDomainId = req.user.camDomains[0].id;
 
-    res.locals.currentDomain = _.first(_.first( req.user.domains, { id: req.session.domainId }));
+    res.locals.currentDomain = _.first(_.first( req.user.camDomains, { id: req.session.camDomainId }));
 
     if( res.locals.currentDomain )
       return next();
 
-    Domain.findOne({ _id: req.session.domainId }, function( err, domain ){
+    Domain.findOne({ _id: req.session.camDomainId }, function( err, domain ){
       if( err ){ return next(err); }
       if( domain ){ res.locals.currentDomain = domain; }
       next();

@@ -78,7 +78,7 @@ module.exports = function GroupModel( caminio, mongoose ){
   function addUser( user, manager, callback ){
     if( manager && manager.id !== this.owner )
       throw 'insufficient rights';
-    user.domains.push( this );
+    user.camDomains.push( this );
     this.users.push( user );
     this.save( callback );
   }
