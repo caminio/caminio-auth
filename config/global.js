@@ -21,7 +21,7 @@ module.exports = function( caminio ){
    */
   function addCurrentUserAndDomain( req, res, next ){
     if( !req.user ){ return next(); }
-    res.locals.currentUser = req.user;
+      res.locals.currentUser = req.user;
     if( !req.session.camDomainId && req.user.camDomains.length > 0 )
       req.session.camDomainId = req.user.camDomains[0].id;
 

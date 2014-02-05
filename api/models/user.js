@@ -7,7 +7,6 @@
  * @license MIT
  *
  */
-
 module.exports = UserModel;
 
 
@@ -17,7 +16,6 @@ module.exports = UserModel;
  *
  * @class User
  */
-
 function UserModel( caminio, mongoose ){
   
   var crypto      = require('crypto');
@@ -33,8 +31,10 @@ function UserModel( caminio, mongoose ){
    *
    **/
   var schema = new mongoose.Schema({
-        firstName: String,
-        lastName: String,
+        name: {
+          first: String,
+          last: String
+        },
         encrypted_password: {type: String, required: true},
         salt: {type: String, required: true},
         preferences: { type: Mixed, default: {} },
@@ -102,10 +102,10 @@ function UserModel( caminio, mongoose ){
     .get( getUserFullName )
     .set( function( name ){
       if( name.split(' ') ){
-        this.firstName = name.split(' ')[0];
-        this.lastName = name.split(' ')[1];
+        this.name.first = name.split(' ')[0];
+        this.name.last = name.split(' ')[1];
       } else
-        this.firstName = name;
+        this.name.first = name;
     });
 
   /**
@@ -256,12 +256,12 @@ function UserModel( caminio, mongoose ){
    *
    **/
   function getUserFullName(){
-    if( this.firstName && this.lastName )
-      return this.firstName + ' ' + this.lastName;
-    else if( this.firstName )
-      return this.firstName;
-    else if( this.lastName )
-      return this.lastName;
+    if( this.name.first && this.name.last )
+      return this.name.first + ' ' + this.name.last;
+    else if( this.name.first )
+      return this.name.first;
+    else if( this.name.last )
+      return this.name.last;
     else
       return this.email;
   }
@@ -297,8 +297,8 @@ function UserModel( caminio, mongoose ){
   }
 
   schema.publicAttributes = [
-    'firstName',
-    'lastName',
+    'name.first',
+    'name.last',
     'fullName',
     'email',
     'lastLoginAt',

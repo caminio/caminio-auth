@@ -1,5 +1,6 @@
 module.exports = function( t ){
 
+  t.authentication_failed = 'Authentication failed!';
   t.auth = t.auth || {};
   t.auth.title = 'Login required';
   t.auth.email_address = 'Email address';

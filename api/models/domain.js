@@ -22,9 +22,9 @@ module.exports = function GroupModel( caminio, mongoose ){
       name: { type: String, 
               required: true,
               lowercase: true,
-              required: true,
               index: { unique: true },
               validate: [ DomainNameValidator, 'invalid domain name' ] },
+      title: String, // could be used to say 'TASTENWERK e.U.'
       users: [ { type: ObjectId, ref: 'User' } ],
       groups: [ { type: ObjectId, ref: 'Group' } ],
       owner: { type: ObjectId, ref: 'User' },
@@ -117,7 +117,7 @@ module.exports = function GroupModel( caminio, mongoose ){
       _.each( gear.applications, function( appDef ){
         var buildAppDef = { name: appDef.name };
         buildAppDef.icon = appDef.icon || 'fa-'+buildAppDef.name.toLowerCase();
-        buildAppDef.path = appDef.path || appDef.name;
+        buildAppDef.path = appDef.path || '/caminio/'+appDef.name;
         buildAppDef.admin = appDef.admin || false;
         buildAppDef.su = appDef.su || false;
         available[appDef.name] = buildAppDef;

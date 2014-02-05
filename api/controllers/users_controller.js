@@ -3,6 +3,7 @@
  */
 module.exports = function UsersController( caminio, policies, middleware ){
 
+  var async         = require('async');
   var User          = caminio.models.User;
 
   return {
@@ -48,6 +49,23 @@ module.exports = function UsersController( caminio, policies, middleware ){
       updateUserPassword,
       function( req, res ){
         res.redirect('/caminio/login');
+      }],
+
+    /**
+     * migrate
+     * this method can be deleted, if not used for caminio < 1.1.0
+     */
+    'migrate': [
+      policies.ensureLogin,
+      function( req, res ){
+        User.find().exec( function( err, users ){
+          if( err ){ return console.log(err); }
+          async.each( users, function( user, next ){
+            user.update({ camDomains: '52ce121b50f45be81891ed29' }, next );
+          }, function( err ){
+            res.send(200, 'done');
+          });
+        });
       }]
 
   };
