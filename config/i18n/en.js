@@ -1,6 +1,8 @@
 module.exports = function( t ){
 
   t.authentication_failed = 'Authentication failed!';
+  t.insufficent_rights = 'Insufficent privileges!';
+
   t.user_unknown = 'Authentication failed';
   t.auth = t.auth || {};
   t.auth.title = 'Login required';
@@ -41,16 +43,5 @@ module.exports = function( t ){
   t.authentication_failed = 'Login failed!';
   t.toggle_sidebar = 'Toggle sidebar';
   t.logout = 'Logout';
-
-  t.user = t.user || {};
-  t.user.password_saved = 'Your new password has been saved';
-  t.user.really_delete = 'Really delete __name__?';
-  t.user.deleted = '__name__ has been deleted';
-  t.user.errors = t.user.errors || {};
-  t.user.errors.too_short = 'The entered password is too short (6 characters at least)';
-  t.user.errors.requirements_not_met = 'The password must contain at least one digit, at least one lower case character, at least one uppercase character';
-
-  t.users = t.users || {};
-  t.users.listing = 'User accounts';
 
 };

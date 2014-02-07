@@ -35,7 +35,7 @@ function UserModel( caminio, mongoose ){
           first: String,
           last: String
         },
-        encrypted_password: {type: String, required: true},
+        encryptedPassword: String,
         salt: {type: String, required: true},
         preferences: { type: Mixed, default: {} },
         //messages: [ MessageSchema ],
@@ -44,7 +44,8 @@ function UserModel( caminio, mongoose ){
                  lowercase: true,
                  required: true,
                  index: { unique: true },
-                 validate: [EmailValidator, 'invalid email address'] },
+                 validate: [EmailValidator, 'invalid email address'] 
+        },
         groups: [ { type: ObjectId, ref: 'Group' } ],
         camDomains: [ { type: ObjectId, ref: 'Domain' } ],
         confirmation: {
@@ -56,12 +57,18 @@ function UserModel( caminio, mongoose ){
         lastLoginAt: Date,
         lastLoginIp: String,
         lastRequestAt: Date,
-        createdAt: { type: Date, default: Date.now },
-        createdBy: { type: ObjectId, ref: 'User' },
-        updatedAt: { type: Date, default: Date.now },
-        updatedBy: { type: ObjectId, ref: 'User' },
-        lockedAt: { type: Date },
-        lockedBy: { type: ObjectId, ref: 'User' },
+        created: { 
+          at: { type: Date, default: Date.now },
+          by: { type: ObjectId, ref: 'User' }
+        },
+        updated: {
+          at: { type: Date, default: Date.now },
+          by: { type: ObjectId, ref: 'User' }
+        },
+        locked: { 
+          at: Date,
+          by: { type: ObjectId, ref: 'User' } 
+        },
         description: String,
         billingInformation: {
           address: {
@@ -84,7 +91,7 @@ function UserModel( caminio, mongoose ){
   });
 
   /**
-   * fullName virtual
+   * name.full virtual
    *
    * constructs a string which is definitely not null
    * and represents a (not unique) name of this user
@@ -98,7 +105,7 @@ function UserModel( caminio, mongoose ){
    *    > Henry King
    *
    **/
-  schema.virtual('fullName')
+  schema.virtual('name.full')
     .get( getUserFullName )
     .set( function( name ){
       if( name.split(' ') ){
@@ -114,7 +121,7 @@ function UserModel( caminio, mongoose ){
    *
    * the password will be available for the rest of this 
    * instance's live-time. Only the encrytped version in 
-   * property encrypted_password will be stored to the db
+   * property encryptedPassword will be stored to the db
    *
    * @method password
    * @param {String} password
@@ -128,7 +135,7 @@ function UserModel( caminio, mongoose ){
     .set(function( password ) {
       this._password = password;
       this.salt = this.generateSalt();
-      this.encrypted_password = this.encryptPassword(password);
+      this.encryptedPassword = this.encryptPassword(password);
     })
     .get(function() { 
       return this._password; 
@@ -145,7 +152,7 @@ function UserModel( caminio, mongoose ){
   the database
   **/
   schema.method('authenticate', function(plainTextPassword) {
-    return this.encryptPassword(plainTextPassword) === this.encrypted_password;
+    return this.encryptPassword(plainTextPassword) === this.encryptedPassword;
   });
 
   /**
@@ -290,7 +297,6 @@ function UserModel( caminio, mongoose ){
       return [ false, 'too_short' ];
     if( confirm_pwd && confirm_pwd !== pwd )
       return [ false, 'confirmation_missmatch' ];
-    //if( !pwd.match(/[A-Z]+[a-z]+[0-9]+[\D]+/) )
     if( !pwd.match(/[A-Z]+[a-z]+[0-9]+/) )
       return [ false, 'requirements_not_met' ];
     return [ true ];
@@ -299,7 +305,7 @@ function UserModel( caminio, mongoose ){
   schema.publicAttributes = [
     'name.first',
     'name.last',
-    'fullName',
+    'name.full',
     'email',
     'lastLoginAt',
     'lastRequestAt',

@@ -13,6 +13,17 @@ module.exports = function UsersController( caminio, policies, middleware ){
     },
 
     /**
+     * override autorest's create method
+     */
+    'create': [
+      policies.userSignup,
+      createUser,
+      sendCredentials,
+      function(req,res){
+        res.json( req.user );
+      }],
+
+    /**
      * reset the user's password
      * @method reset
      */
@@ -39,13 +50,6 @@ module.exports = function UsersController( caminio, policies, middleware ){
       getUserById,
       checkValidRequest,
       checkPassword,
-      function(req,res,next){
-        if( !req.user ){
-          req.flash('error', req.i18n.t('auth.security_transgression'));
-          return res.redirect('/caminio/login');
-        }
-        next();
-      },
       updateUserPassword,
       function( req, res ){
         res.redirect('/caminio/login');
@@ -56,12 +60,14 @@ module.exports = function UsersController( caminio, policies, middleware ){
      * this method can be deleted, if not used for caminio < 1.1.0
      */
     'migrate': [
-      policies.ensureLogin,
       function( req, res ){
         User.find().exec( function( err, users ){
           if( err ){ return console.log(err); }
           async.each( users, function( user, next ){
-            user.update({ camDomains: '52ce121b50f45be81891ed29' }, next );
+            user.update({ 
+              camDomains: '52ce121b50f45be81891ed29',
+              encryptedPassword: user.encrypted_password
+            }, next );
           }, function( err ){
             res.send(200, 'done');
           });
@@ -87,6 +93,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
    */
   function updateUserPassword(req,res,next){
     req.user.password = req.body.password;
+    req.user.confirmation.key = null;
     req.user.save( function( err ){
       if( err ){ return next(err); }
       req.user.populate('domains', function(err,user){
@@ -107,14 +114,17 @@ module.exports = function UsersController( caminio, policies, middleware ){
    * @private
    */
   function checkValidRequest(req,res,next){
-    if( !req.user ){ return next(); }
+    if( !req.user ){
+      req.flash('error', req.i18n.t('auth.security_transgression'));
+      return res.redirect('/caminio/login');
+    }
     if( !( req.user.confirmation && req.user.confirmation.key === req.params.key ) ){
       req.flash('error', req.i18n.t('auth.confirmation_missmatch'));
-      return next();
+      return res.redirect('/caminio/login');
     }
     if( !( req.user.confirmation && req.user.confirmation.expires < new Date() ) ){
       req.flash('error', req.i18n.t('auth.confirmation_expired') );
-      return next();
+      return res.redirect('/caminio/login');
     }
     next();
   }
@@ -130,6 +140,51 @@ module.exports = function UsersController( caminio, policies, middleware ){
       return res.redirect('/caminio/accounts/'+req.params.id+'/reset/'+req.params.key);
     }
     next();
+  }
+
+  /**
+   * @method createUser
+   * @private
+   */
+  function createUser( req, res, next ){
+    if( !('user' in req.body) )
+      return res.json(400,{ error: 'missing_model_name_in_body', expected: 'expected "user"', got: req.body });
+
+    if( req.body.user && req.body.user.autoPassword )
+      req.body.user.password = (Math.random()+(new Date().getTime().toString())).toString(36);
+
+    req.body.user.camDomain = res.locals.currentDomain;
+
+    User.create( req.body.user, function( err, user ){
+      if( err ){ return res.json( 500, { error: 'server_error', details: err }); }
+      if( !user ){ return res.json( 500, { error: 'unknown_error', details: 'did not get a user object after database action'}); }
+      req.user = user;
+      next();
+    });
+  }
+
+  /**
+   * @method sendCredentials
+   * @private
+   */
+  function sendCredentials( req, res, next ){
+    caminio.mailer.send(
+      req.user.email,
+      req.i18n.t('auth.mailer.subject_reset_password'), 
+      'users/send_credentials', 
+      { 
+        locals: {
+          welcome: true,
+          user: req.user,
+          domain: res.locals.currentDomain,
+          creator: res.locals.currentUser,
+          url: (req.protocol + "://" + req.get('host') + '/caminio/accounts/' + req.user.id + '/reset/' + req.user.confirmation.key)
+        } 
+      },
+      function( err ){
+        if( err ){ return res.json(err); }
+        next();
+      });
   }
 
 };
