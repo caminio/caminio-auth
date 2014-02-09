@@ -66,7 +66,7 @@ function UserModel( caminio, mongoose ){
           by: { type: ObjectId, ref: 'User' }
         },
         locked: { 
-          at: Date,
+          at: { type: Date },
           by: { type: ObjectId, ref: 'User' } 
         },
         description: String,

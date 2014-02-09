@@ -15,6 +15,8 @@ module.exports.routes = {
   'GET /caminio/accounts/:id/reset/:key': 'UsersController#reset',
   'POST /caminio/accounts/:id/reset/:key': 'UsersController#do_reset',
 
+  'autorest /caminio/domains': 'Domain',
+
   '/caminio/initial_setup': 'Auth::V1::AuthController#setup',
   'POST /caminio/initial_setup': 'Auth::V1::AuthController#do_setup',
 

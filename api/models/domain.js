@@ -9,12 +9,14 @@
  */
 
 var _       = require('lodash');
+
+module.exports = DomainModel;
+
 /**
  *
  * @class Domain
- */
- 
-module.exports = function GroupModel( caminio, mongoose ){
+ */ 
+function DomainModel( caminio, mongoose ){
 
   var ObjectId = mongoose.Schema.Types.ObjectId;
 
@@ -51,6 +53,25 @@ module.exports = function GroupModel( caminio, mongoose ){
   schema.method( 'addUser', addUser );
   schema.method( 'allowedApps', allowedApps );
   
+  schema.publicAttributes = [
+    'name',
+    'title',
+    'users',
+    'owner',
+    'plan',
+    'preferences',
+    'locked',
+    'created',
+    'updated',
+    'description'
+  ];
+
+  // do population on autorest show
+  schema.static('populateOnShow', [
+    'owner',
+    'created.by'
+  ]);
+
   return schema;
 
   /**
