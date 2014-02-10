@@ -74,7 +74,7 @@ module.exports = function AuthController( caminio, policies, middleware ){
     'logout':
       function( req, res ){
         req.logout();
-        req.session.currentcamDomainId = null;
+        req.session.camDomainId = null;
         res.redirect('/');
       },
 
@@ -221,8 +221,8 @@ module.exports = function AuthController( caminio, policies, middleware ){
    *
    */
   function checkInitialSetupAndRedirect( req, res, next ){
-    if( caminio.config.superusers && caminio.config.superusers.length > 0 )
-      return next();
+    //if( caminio.config.superusers && caminio.config.superusers.length > 0 )
+    //  return next();
     User.count( function( err, count ){
       if( err ){ caminio.logger.error('unknown error occured:', err); }
       if( count > 0 ){ return next(); }

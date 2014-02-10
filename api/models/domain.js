@@ -31,7 +31,8 @@ function DomainModel( caminio, mongoose ){
       groups: [ { type: ObjectId, ref: 'Group' } ],
       owner: { type: ObjectId, ref: 'User' },
       plan: { type: String, default: 'default' },
-      preferences: { type: mongoose.Schema.Types.Mixed },
+      planPrice: Number,
+      preferences: { type: mongoose.Schema.Types.Mixed, default: {} },
       allowedAppNames: { type: Array, default: ['admin'] },
       //messages: [ MessageSchema ],
       created: { 
@@ -59,6 +60,7 @@ function DomainModel( caminio, mongoose ){
     'users',
     'owner',
     'plan',
+    'planPrice',
     'preferences',
     'locked',
     'created',

@@ -163,6 +163,7 @@ function UserModel( caminio, mongoose ){
   schema.method('generateConfirmationKey', function() {
     this.confirmation.key = caminioUtil.uid(8);
     this.confirmation.expires = new Date()+1800*1000;
+    this.confirmation.tries = this.confirmation.tries || 0;
     this.confirmation.tries += 1;
   });
 

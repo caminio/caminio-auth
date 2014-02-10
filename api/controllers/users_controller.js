@@ -12,6 +12,13 @@ module.exports = function UsersController( caminio, policies, middleware ){
       '*!(reset,do_reset)': policies.ensureLogin
     },
 
+    'index': [
+      findUsersForDomain,
+      function( req, res ){
+        res.json( req.users );
+      }
+    ],
+
     /**
      * override autorest's create method
      */
@@ -185,6 +192,19 @@ module.exports = function UsersController( caminio, policies, middleware ){
         if( err ){ return res.json(err); }
         next();
       });
+  }
+
+  /**
+   * @method findUsersForDomain
+   * @private
+   */
+  function findUsersForDomain( req, res, next ){
+    User.find({ camDomains: res.locals.currentDomain })
+    .exec( function( err, users ){
+      if( err ){ return res.json(500, { error: 'server_error', details: err }); }
+      req.users = users;
+      next();
+    });
   }
 
 };

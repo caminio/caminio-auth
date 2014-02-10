@@ -7,25 +7,32 @@ module.exports = function( caminio ){
   var Domain = caminio.models.Domain;
 
   return [ 
-    addCurrentUserAndDomain,
+    addCurrentDomain,
+    addCurrentUser,
     addAllowedApps
   ];
 
   /**
    *
-   * adds the currentUser and currentDomain object
+   * adds the currentUser
    * to res.locals
    *
    * @method addCurrentDomain
    *
    */
-  function addCurrentUserAndDomain( req, res, next ){
-    if( !req.user ){ return next(); }
-      res.locals.currentUser = req.user;
-    if( !req.session.camDomainId && req.user.camDomains.length > 0 )
-      req.session.camDomainId = req.user.camDomains[0].id;
+  function addCurrentDomain( req, res, next ){
+    if( !req.user )
+      return next();
 
-    res.locals.currentDomain = _.first(_.first( req.user.camDomains, { id: req.session.camDomainId }));
+    if( req.param('camDomainId') )
+      req.session.camDomainId = req.param('camDomainId');
+
+    // if no session or no explicit request, set
+    // currentDomain to user's first domain
+    if( req.session.camDomainId )
+      res.locals.currentDomain = _.first(_.first( req.user.camDomains, { id: req.session.camDomainId }));
+    else
+      res.locals.currentDomain = req.user.camDomains[0];
 
     if( res.locals.currentDomain )
       return next();
@@ -35,6 +42,24 @@ module.exports = function( caminio ){
       if( domain ){ res.locals.currentDomain = domain; }
       next();
     });
+
+  }
+
+  /**
+   *
+   * adds the currentUser
+   * to res.locals
+   *
+   * @method addCurrentDomain
+   *
+   */
+  function addCurrentUser( req, res, next ){
+    
+    if( !req.user )
+      return next();
+    res.locals.currentUser = req.user;
+
+    next();
 
   }
 

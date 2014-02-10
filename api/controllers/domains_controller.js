@@ -21,9 +21,21 @@ module.exports = function UsersController( caminio, policies, middleware ){
       findUser,
       createUserIfNotFound,
       createDomain,
+      updateCamDomainInUser,
       function(req,res){
         res.json( req.domain );
       }],
+
+      'destroy': [
+        getDomain,
+        requireSuperUserOrOwner,
+        destroyUsers,
+        destroyDomain,
+        function( req, res ){
+          req.session.camDomainId = null;
+          res.json(200, { affectedUsers: req.affectedUsers });
+        }
+      ]
 
   };
 
@@ -77,6 +89,60 @@ module.exports = function UsersController( caminio, policies, middleware ){
         if( err ){ return res.json(500, { error: 'server_error', details: err } ); }
         req.domain = domain;
         next();
+    });
+  }
+
+  /**
+   * update the camDomains field in the user obj
+   */
+  function updateCamDomainInUser( req, res, next ){
+    if( !req.user )
+      return next();
+    req.user.camDomains = req.domain;
+    req.user.save( function( err ){
+      if( err ){ return res.json(500, { error: 'server_error', details: err } ); }
+      next();
+    });
+  }
+
+  function requireSuperUserOrOwner( req, res, next ){
+    if( res.locals.currentUser.isSuperUser() )
+      return next();
+    if( req.domain.owner.toString() === req.user.id )
+      return next();
+    return res.json(403, { error: 'insufficient_rights' });
+  }
+
+  function destroyUsers( req, res, next ){
+    User.find({ camDomains: req.domain.id }, function( err, users ){
+      if( err ){ return res.json(500, { error: 'server_error', details: err, fn: 'destroyUsers' } ); }
+      async.each( users, function( user, nextUser ){
+        if( user.camDomains.length === 1 )
+          user.remove( function( err ){
+            req.affectedUsers = req.affectedUsers || 0;
+            req.affectedUsers += 1;
+            if( err ){ return res.json(500, { error: 'server_error', details: err, fn: 'destroyUsers#removeUser' } ); }
+            nextUser();
+          });
+        else
+          nextUser();
+      }, next);
+    });
+  }
+
+  function destroyDomain( req, res, next ){
+    req.domain.remove( function( err ){
+      if( err ){ return res.json(500, { error: 'server_error', details: err, fn: 'destroyDomain' } ); }
+      next();
+    });
+  }
+
+  function getDomain( req, res, next ){
+    Domain.findOne({ _id: req.param('id') }, function( err, domain ){
+      if( err ){ return res.json(500, { error: 'server_error', details: err } ); }
+      if( !domain ){ return res.json(404, { erro: 'not_found' }); }
+      req.domain = domain;
+      next();
     });
   }
 
