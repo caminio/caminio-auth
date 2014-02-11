@@ -13,7 +13,7 @@ module.exports = function( caminio ){
   return function userSignup(req, res, next) {
     if( caminio.config.signup && caminio.config.signup === 'public' )
       return next();
-    if( res.locals.currentUser.isAdmin() )
+    if( res.locals.currentUser.isAdmin(res.locals.currentDomain) )
       return next();
     req.flash('error', req.i18n.t('insufficient_rights') );
     if( res.locals.currentUser )

@@ -160,7 +160,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
     if( req.body.user && req.body.user.autoPassword )
       req.body.user.password = (Math.random()+(new Date().getTime().toString())).toString(36);
 
-    req.body.user.camDomain = res.locals.currentDomain;
+    req.body.user.camDomains = res.locals.currentDomain;
 
     User.create( req.body.user, function( err, user ){
       if( err ){ return res.json( 500, { error: 'server_error', details: err }); }

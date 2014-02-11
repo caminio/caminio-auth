@@ -216,7 +216,8 @@ function UserModel( caminio, mongoose ){
   schema.method('isAdmin', function(groupOrDomain){
     if( this.isSuperUser() )
       return true;
-    if( groupOrDomain instanceof orm.models.Domain )
+    console.log('checking admin', groupOrDomain);
+    if( groupOrDomain instanceof caminio.models.Domain )
       return groupOrDomain.owner.equals( this._id.toString() );
     return this.role <= 5;
   });
