@@ -8,7 +8,7 @@
  *
  */
 
-var express = require('../../node_modules/caminio/node_modules/express');
+var express = require('express');
 
 module.exports = function( caminio ){
 

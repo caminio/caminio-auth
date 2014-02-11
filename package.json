@@ -18,7 +18,8 @@
     "passport-http-bearer": "~1.0.1",
     "passport-oauth2-client-password": "~0.1.1",
     "passport-http": "~0.2.2",
-    "lodash": "~2.4.1"
+    "lodash": "~2.4.1",
+    "express": "~3.4.8"
   },
   "devDependencies": {
     "caminio-fixtures": "git://github.com/tastenwerk/caminio-fixtures#0.1.1",
