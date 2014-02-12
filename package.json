@@ -19,7 +19,8 @@
     "passport-oauth2-client-password": "~0.1.1",
     "passport-http": "~0.2.2",
     "lodash": "~2.4.1",
-    "express": "~3.4.8"
+    "express": "~3.4.8",
+    "async": "~0.2.9"
   },
   "devDependencies": {
     "caminio-fixtures": "git://github.com/tastenwerk/caminio-fixtures#0.1.1",
@@ -28,8 +29,7 @@
     "superagent": "~0.15.7",
     "grunt": "~0.4.2",
     "grunt-mocha-test": "~0.8.2",
-    "mongoose": "~3.8.4",
-    "async": "~0.2.9"
+    "mongoose": "~3.8.4"
   },
   "main": "lib/caminio.js",
   "scripts": {
