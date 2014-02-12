@@ -13,6 +13,16 @@ module.exports = function UsersController( caminio, policies, middleware ){
       '*': policies.ensureLogin
     },
 
+    'index': [
+      requireSuperUser,
+      function( req, res ){
+        Domain.find().populate('owner').exec( function( err, domains ){
+          if( err ){ return res.json( 500, { error: 'server_error', details: err }); }
+          res.json( domains );
+        });
+      }
+    ],
+
     /**
      * override autorest's create method
      */

@@ -58,13 +58,13 @@ function DomainModel( caminio, mongoose ){
     'title',
     'users',
     'owner',
-    'plan',
-    'planPrice',
     'preferences',
     'locked',
     'created',
     'updated',
-    'description'
+    'description',
+    'allowedAppNames',
+    'selectedApps'
   ];
 
   // do population on autorest show
