@@ -12,10 +12,13 @@ module.exports = function UsersController( caminio, policies, middleware ){
       '*!(reset,do_reset)': policies.ensureLogin
     },
 
+    /**
+     * return all users matching the currentDomain
+     */
     'index': [
-      findUsersForDomain,
+      getUsersByCamDomain,
       function( req, res ){
-        res.json( req.users );
+        res.json({ users: req.users });
       }
     ],
 
@@ -27,7 +30,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
       createUser,
       sendCredentials,
       function(req,res){
-        res.json( req.user );
+        res.json({ user: req.user });
       }],
 
     /**
@@ -195,16 +198,16 @@ module.exports = function UsersController( caminio, policies, middleware ){
   }
 
   /**
-   * @method findUsersForDomain
+   * @method getUsersByCamDomain
    * @private
    */
-  function findUsersForDomain( req, res, next ){
-    User.find({ camDomains: res.locals.currentDomain })
-    .exec( function( err, users ){
-      if( err ){ return res.json(500, { error: 'server_error', details: err }); }
-      req.users = users;
-      next();
-    });
+  function getUsersByCamDomain( req, res, next ){
+    User.find({ camDomains: res.locals.currentDomain._id })
+        .exec( function( err, users ){
+          if( err ){ return res.json( 500, { error: 'server_error', details: err }); }
+          req.users = users;
+          next();
+        });
   }
 
 };

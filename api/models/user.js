@@ -31,63 +31,55 @@ function UserModel( caminio, mongoose ){
    *
    **/
   var schema = new mongoose.Schema({
-        name: {
-          first: String,
-          last: String
-        },
-        encryptedPassword: String,
-        salt: {type: String, required: true},
-        preferences: { type: Mixed, default: {} },
-        //messages: [ MessageSchema ],
-        lang: { type: String, default: 'en' },
-        email: { type: String, 
-                 lowercase: true,
-                 required: true,
-                 index: { unique: true },
-                 validate: [EmailValidator, 'invalid email address'] 
-        },
-        groups: [ { type: ObjectId, ref: 'Group' } ],
-        camDomains: [ { type: ObjectId, ref: 'Domain' } ],
-        confirmation: {
-          key: String,
-          expires: Date,
-          tries: Number
-        },
-        role: { type: Number, default: 100 },
-        lastLoginAt: Date,
-        lastLoginIp: String,
-        lastRequestAt: Date,
-        created: { 
-          at: { type: Date, default: Date.now },
-          by: { type: ObjectId, ref: 'User' }
-        },
-        updated: {
-          at: { type: Date, default: Date.now },
-          by: { type: ObjectId, ref: 'User' }
-        },
-        locked: { 
-          at: { type: Date },
-          by: { type: ObjectId, ref: 'User' } 
-        },
-        description: String,
-        billingInformation: {
-          address: {
-            street: String,
-            zip: String,
-            city: String,
-            state: String,
-            country: String,
-            salutation: String,
-            academicalTitle: String
-          },
-          email: { type: String, 
-                   lowercase: true,
-                   match: /@/ },
-        },
-        phone: {
-          type: String,
-          match: /^[\d]*$/
-        }
+    firstname: String,
+    lastname: String,
+    encryptedPassword: String,
+    salt: {type: String, required: true},
+    preferences: { type: Mixed, default: {} },
+    //messages: [ MessageSchema ],
+    lang: { type: String, default: 'en' },
+    email: { type: String, 
+             lowercase: true,
+             required: true,
+             index: { unique: true },
+             validate: [EmailValidator, 'invalid email address'] 
+    },
+    groups: [ { type: ObjectId, ref: 'Group' } ],
+    camDomains: [ { type: ObjectId, ref: 'Domain' } ],
+    confirmation: {
+      key: String,
+      expires: Date,
+      tries: Number
+    },
+    role: { type: Number, default: 100 },
+    lastLoginAt: Date,
+    lastLoginIp: String,
+    lastRequestAt: Date,
+    createdAt: { type: Date, default: Date.now },
+    createdBy: { type: ObjectId, ref: 'User' },
+    updatedAt: { type: Date, default: Date.now },
+    updatedBy: { type: ObjectId, ref: 'User' },
+    lockedAt: { type: Date },
+    lockedBy: { type: ObjectId, ref: 'User' },
+    description: String,
+    billingInformation: {
+      address: {
+        street: String,
+        zip: String,
+        city: String,
+        state: String,
+        country: String,
+        salutation: String,
+        academicalTitle: String
+      },
+      email: { type: String, 
+               lowercase: true,
+               match: /@/ },
+    },
+    phone: {
+      type: String,
+      match: /^[\d]*$/
+    }
   });
 
   /**
@@ -105,7 +97,7 @@ function UserModel( caminio, mongoose ){
    *    > Henry King
    *
    **/
-  schema.virtual('name.full')
+  schema.virtual('fullname')
     .get( getUserFullName )
     .set( function( name ){
       if( name.split(' ') ){
@@ -265,12 +257,12 @@ function UserModel( caminio, mongoose ){
    *
    **/
   function getUserFullName(){
-    if( this.name.first && this.name.last )
-      return this.name.first + ' ' + this.name.last;
-    else if( this.name.first )
-      return this.name.first;
-    else if( this.name.last )
-      return this.name.last;
+    if( this.firstname && this.lastname )
+      return this.firstname + ' ' + this.lastname;
+    else if( this.firstname )
+      return this.firstname;
+    else if( this.lastname )
+      return this.lastname;
     else
       return this.email;
   }
@@ -305,9 +297,9 @@ function UserModel( caminio, mongoose ){
   }
 
   schema.publicAttributes = [
-    'name.first',
-    'name.last',
-    'name.full',
+    'firstname',
+    'lastname',
+    'camDomains',
     'email',
     'lastLoginAt',
     'lastRequestAt',
