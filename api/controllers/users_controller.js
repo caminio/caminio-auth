@@ -164,6 +164,9 @@ module.exports = function UsersController( caminio, policies, middleware ){
     if( req.body.user && req.body.user.autoPassword )
       req.body.user.password = (Math.random()+(new Date().getTime().toString())).toString(36);
 
+    if( req.body.user && req.body.user.admin )
+      req.body.user.role = 1;
+
     req.body.user.camDomains = res.locals.currentDomain;
 
     User.create( req.body.user, function( err, user ){

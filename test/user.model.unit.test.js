@@ -93,6 +93,28 @@ describe('User', function(){
 
     });
 
+    describe('admin', function(){
+
+      it('makes user an admin', function(){
+        this.user.admin = true;
+        expect(this.user.admin).to.be.true;
+        expect(this.user.role).to.eql(1);
+      });
+
+      it('returns true for just made admin', function(){
+        expect(this.user.admin).to.be.true;
+        expect(this.user.role).to.eql(1);
+      });
+
+      it('removes admin privileges from user', function(){
+        this.user.admin = false;
+        expect(this.user.admin).to.be.false;
+        expect(this.user.role).to.eql(100);
+      })
+
+    });
+
+
   });
   
 
