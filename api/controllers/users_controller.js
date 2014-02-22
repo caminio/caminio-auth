@@ -5,6 +5,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
 
   var async         = require('async');
   var User          = caminio.models.User;
+  var util          = require('caminio/util');
 
   return {
 
@@ -166,7 +167,12 @@ module.exports = function UsersController( caminio, policies, middleware ){
     req.body.user.camDomains = res.locals.currentDomain;
 
     User.create( req.body.user, function( err, user ){
-      if( err ){ return res.json( 500, { error: 'server_error', details: err }); }
+      if( err ){ 
+        if( err.name && err.name === 'ValidationError' ){
+          return res.json( 422, util.formatErrors(err) );
+        }
+        return res.json( 500, { error: 'server_error', details: err }); 
+      }
       if( !user ){ return res.json( 500, { error: 'unknown_error', details: 'did not get a user object after database action'}); }
       req.user = user;
       next();

@@ -34,7 +34,7 @@ function UserModel( caminio, mongoose ){
     firstname: String,
     lastname: String,
     encryptedPassword: String,
-    salt: {type: String, required: true},
+    salt: {type: String},
     preferences: { type: Mixed, default: {} },
     //messages: [ MessageSchema ],
     lang: { type: String, default: 'en' },
@@ -42,7 +42,7 @@ function UserModel( caminio, mongoose ){
              lowercase: true,
              required: true,
              index: { unique: true },
-             validate: [EmailValidator, 'invalid email address'] 
+             validate: [EmailValidator, 'invalid_email_address'] 
     },
     groups: [ { type: ObjectId, ref: 'Group' } ],
     camDomains: [ { type: ObjectId, ref: 'Domain' } ],
