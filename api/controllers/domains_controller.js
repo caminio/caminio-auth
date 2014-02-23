@@ -6,6 +6,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
   var async         = require('async');
   var User          = caminio.models.User;
   var Domain        = caminio.models.Domain;
+  var util          = require('caminio/util');
 
   return {
 
@@ -18,6 +19,18 @@ module.exports = function UsersController( caminio, policies, middleware ){
       function( req, res ){
         Domain.find().populate('owner').exec( function( err, domains ){
           if( err ){ return res.json( 500, { error: 'server_error', details: err }); }
+          if( req.header('namespaced') ){
+            if( req.header('sideload') ){
+              var owners = [];
+              for( var i in domains ){
+                domains[i] = domains[i].toObject();
+                owners.push( domains[i].owner );
+                domains[i].user = domains[i].owner._id.toString();
+              }
+              return res.json( { domains: domains, users: owners } );
+            }
+            return res.json( { domains: domains } );
+          }
           res.json( domains );
         });
       }
@@ -33,6 +46,8 @@ module.exports = function UsersController( caminio, policies, middleware ){
       createDomain,
       updateCamDomainInUser,
       function(req,res){
+        if( req.header('namespaced') )
+          return res.json({ domain: req.domain });
         res.json( req.domain );
       }],
 
@@ -43,7 +58,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
         destroyDomain,
         function( req, res ){
           req.session.camDomainId = null;
-          res.json(200, { affectedUsers: req.affectedUsers });
+          res.json(200, { meta: { affectedUsers: req.affectedUsers }});
         }
       ]
 
@@ -61,7 +76,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
    * find user and fill req.user
    */
   function findUser( req, res, next ){
-    User.findOne({ email: req.body.domain.owner.email })
+    User.findOne({ email: req.body.domain.user.email })
       .exec( function( err, user ){
         if( err ){ return res.json(500, { error: 'server_error', details: err } ); }
         req.user = user;
@@ -77,8 +92,10 @@ module.exports = function UsersController( caminio, policies, middleware ){
     if( req.user )
       return next();
     User.create({ 
-      email: req.body.domain.owner.email, 
-      password: req.body.domain.owner.password || (new Date()).getTime().toString()}, function( err, user ){
+      email: req.body.domain.user.email, 
+      password: req.body.domain.user.password || (new Date()).getTime().toString()}, function( err, user ){
+        if( err && err.name && err.name === 'ValidationError' )
+          return res.json( 422, util.formatErrors(err) );
         if( err ){ return res.json(500, { error: 'server_error', details: err } ); }
         req.user = user;
         next();
@@ -95,7 +112,9 @@ module.exports = function UsersController( caminio, policies, middleware ){
       name: req.body.domain.name,
       title: req.body.domain.title,
       description: req.body.domain.description,
-      owner: req.user }, function( err, domain ){      
+      owner: req.user }, function( err, domain ){
+        if( err && err.name && err.name === 'ValidationError' )
+          return res.json( 422, util.formatErrors(err) );
         if( err ){ return res.json(500, { error: 'server_error', details: err } ); }
         req.domain = domain;
         next();

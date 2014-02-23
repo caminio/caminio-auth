@@ -25,7 +25,7 @@ function DomainModel( caminio, mongoose ){
               required: true,
               lowercase: true,
               index: { unique: true },
-              validate: [ DomainNameValidator, 'invalid domain name' ] },
+              validate: [ DomainNameValidator, 'invalid_domain_name' ] },
       title: String, // could be used to say 'TASTENWERK e.U.'
       users: [ { type: ObjectId, ref: 'User' } ],
       groups: [ { type: ObjectId, ref: 'Group' } ],

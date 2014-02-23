@@ -54,6 +54,19 @@ module.exports = function UsersController( caminio, policies, middleware ){
       }],
 
     /**
+     * update the user
+     * @method update
+     */
+    'update': [
+      getUserById,
+      updateUser,
+      sendCredentials,
+      function(req,res){
+        res.json({ user: req.user });
+      }
+    ],
+
+    /**
      * do reset the user's password
      * @method do_reset
      */
@@ -178,6 +191,42 @@ module.exports = function UsersController( caminio, policies, middleware ){
       }
       if( !user ){ return res.json( 500, { error: 'unknown_error', details: 'did not get a user object after database action'}); }
       req.user = user;
+      next();
+    });
+  }
+
+  /**
+   * @method updateUser
+   * @private
+   */
+  function updateUser( req, res, next ){
+    if( req.param('id') !== res.locals.currentUser.id && !res.locals.currentUser.isAdmin() )
+      return res.json(403, { error: 'security_transgression' });
+
+    if( !('user' in req.body) )
+      return res.json(400,{ error: 'missing_model_name_in_body', expected: 'expected "user"', got: req.body });
+
+    if( req.body.user && req.body.user.autoPassword )
+      req.body.user.password = (Math.random()+(new Date().getTime().toString())).toString(36);
+
+    if( req.body.user && req.body.user.admin )
+      req.body.user.role = 1;
+    else
+      req.body.user.role = 100;
+
+    req.body.user.camDomains = res.locals.currentDomain;
+
+    for( var i in req.body.user ){
+      if( i in req.user.constructor.schema.paths )
+        req.user[i] = req.body.user[i];
+    }
+
+    req.user.save( function( err ){
+      if( err ){ 
+        if( err.name && err.name === 'ValidationError' )
+          return res.json( 422, util.formatErrors(err) );
+        return res.json( 500, { error: 'server_error', details: err }); 
+      }
       next();
     });
   }
