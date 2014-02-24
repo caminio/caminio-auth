@@ -48,8 +48,6 @@ describe('Auth integration', function(){
       test.agent.post( helper.url+'/login' )
       .send({ username: user.email, password: user.password })
       .end(function(err,res){
-        console.log('routes');
-        console.log(caminio.controller.routes());
         expect(err).to.be.null;
         expect(res.status).to.eq(200);
         expect(res.text).to.match(/caminio dashboard/);

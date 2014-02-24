@@ -19,6 +19,7 @@ module.exports = DomainModel;
 function DomainModel( caminio, mongoose ){
 
   var ObjectId = mongoose.Schema.Types.ObjectId;
+  var Mixed = mongoose.Schema.Types.Mixed;
 
   var schema = new mongoose.Schema({
       name: { type: String, 
@@ -47,6 +48,12 @@ function DomainModel( caminio, mongoose ){
         by: { type: ObjectId, ref: 'User' }
       },
       description: String,
+      /**
+       *  Holds statistic Data over the 31 days
+       *  @attribute stats
+       *  @type Mixed
+       */
+      stats : { type: Mixed, default: {} }
   });
 
   schema.method( 'lock', lock );
@@ -64,7 +71,8 @@ function DomainModel( caminio, mongoose ){
     'updated',
     'description',
     'allowedAppNames',
-    'selectedApps'
+    'selectedApps',
+    'stats'
   ];
 
   // do population on autorest show

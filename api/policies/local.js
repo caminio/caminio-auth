@@ -8,8 +8,8 @@
  *
  */
 
-var passport = require('passport')
-  , LocalStrategy = require('passport-local').Strategy
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
 
 module.exports = function( caminio ){
 
@@ -27,11 +27,11 @@ module.exports = function( caminio ){
         if( err ){ caminio.logger.error(err); return done(err); }
         if( !user ){ return done(null, false, { message: 'user_unknown' }); }
         if( !user.authenticate( password ) )
-          return done( null, false, { message: 'authentication_failed' });
-        user.update({ lastLoginAt: new Date(), lastRequestAt: new Date() }, function( err ){
+          return done( null, false, { message: 'authentication_failed' });        
+        user.update({ lastLoginAt: new Date(), lastRequestAt: new Date()}, function( err ){
           if( err ){ return done(err); }
           done( null, user );
-        })
+        });
       });
     }
   ));

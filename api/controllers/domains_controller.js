@@ -70,6 +70,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
   function requireSuperUser( req, res, next ){
     if( res.locals.currentUser.isSuperUser() )
       return next();
+    return res.json(403, { error: 'security_transgression' } );
   }
 
   /**
