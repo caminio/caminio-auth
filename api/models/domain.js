@@ -78,7 +78,7 @@ function DomainModel( caminio, mongoose ){
   // do population on autorest show
   schema.static('populateOnShow', [
     'owner',
-    'created.by'
+    'createdBy'
   ]);
 
   return schema;
