@@ -75,6 +75,7 @@ module.exports = function AuthController( caminio, policies, middleware ){
       function( req, res ){
         req.logout();
         req.session.camDomainId = null;
+        req.session.locale = null;
         res.redirect('/');
       },
 

@@ -303,6 +303,7 @@ function UserModel( caminio, mongoose ){
   schema.publicAttributes = [
     'firstname',
     'lastname',
+    'lang',
     'camDomains',
     'email',
     'lastLoginAt',
