@@ -29,24 +29,20 @@ function DomainModel( caminio, mongoose ){
               validate: [ DomainNameValidator, 'invalid_domain_name' ] },
       title: String, // could be used to say 'TASTENWERK e.U.'
       users: [ { type: ObjectId, ref: 'User' } ],
+      lang: { type: String, default: 'en' },
       groups: [ { type: ObjectId, ref: 'Group' } ],
       owner: { type: ObjectId, ref: 'User' },
       selectedApps: { type: mongoose.Schema.Types.Mixed, default: {} }, 
       preferences: { type: mongoose.Schema.Types.Mixed, default: {} },
       allowedAppNames: { type: Array, default: ['admin'] },
-      //messages: [ MessageSchema ],
-      created: { 
-        at: { type: Date, default: Date.now },
-        by: { type: ObjectId, ref: 'User' }
-      },
-      updated: { 
-        at: { type: Date, default: Date.now },
-        by: { type: ObjectId, ref: 'User' }
-      },
-      locked: {
-        at: { type: Date },
-        by: { type: ObjectId, ref: 'User' }
-      },
+      createdAt:{ type: Date, default: Date.now },
+      createdBy: { type: ObjectId, ref: 'User' },
+      updatedAt: { type: Date, default: Date.now },
+      updatedBy: { type: ObjectId, ref: 'User' },
+
+      lockedAt: { type: Date },
+      lockedBy: { type: ObjectId, ref: 'User' },
+
       description: String,
       /**
        *  Holds statistic Data over the 31 days
@@ -63,6 +59,7 @@ function DomainModel( caminio, mongoose ){
   schema.publicAttributes = [
     'name',
     'title',
+    'lang',
     'users',
     'owner',
     'preferences',
@@ -72,13 +69,20 @@ function DomainModel( caminio, mongoose ){
     'description',
     'allowedAppNames',
     'selectedApps',
-    'stats'
+    'stats',
+    'createdAt',
+    'createdBy',
+    'updatedAt',
+    'updatedBy',
+    'lockedAt',
+    'lockedBy'
   ];
 
   // do population on autorest show
   schema.static('populateOnShow', [
     'owner',
-    'createdBy'
+    'createdBy',
+    'updatedBy'
   ]);
 
   return schema;

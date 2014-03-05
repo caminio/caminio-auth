@@ -180,6 +180,9 @@ module.exports = function UsersController( caminio, policies, middleware ){
     if( req.body.user && req.body.user.admin )
       req.body.user.role = 1;
 
+    if( res.locals.currentDomain.lang )
+      req.body.user.lang = res.locals.currentDomain.lang;
+
     req.body.user.camDomains = res.locals.currentDomain;
 
     User.create( req.body.user, function( err, user ){

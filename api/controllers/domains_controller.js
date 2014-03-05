@@ -36,6 +36,28 @@ module.exports = function UsersController( caminio, policies, middleware ){
       }
     ],
 
+    'show': [
+      requireSuperUser,
+      function( req, res ){
+        Domain.find({ _id: req.param('id') }).populate('owner').exec( function( err, domains ){
+          if( err ){ return res.json( 500, { error: 'server_error', details: err }); }
+          if( req.header('namespaced') ){
+            if( req.header('sideload') ){
+              var owners = [];
+              for( var i in domains ){
+                domains[i] = domains[i].toObject();
+                owners.push( domains[i].owner );
+                domains[i].user = domains[i].owner._id.toString();
+              }
+              return res.json( { domain: domains, users: owners } );
+            }
+            return res.json( { domain: domains } );
+          }
+          res.json( domains );
+        });
+      }
+    ],
+    
     /**
      * override autorest's create method
      */
