@@ -14,14 +14,13 @@ module.exports = function( caminio ){
     
   return function ensureBasicOrLogin(req, res, next) {
 
-    if (!req.isAuthenticated || !req.isAuthenticated()) {
-      
-      if( req.header('Authorization') )
+    if ( !req.isAuthenticated() ) {
+      //if( req.header('Authorization') )
         return passport.authenticate('basic', { session: false })( req, res, next );
-      else{
-        req.session.returnTo = req.originalUrl || req.url;
-        return res.redirect('/caminio/login');
-      }
+      // else{
+      //   req.session.returnTo = req.originalUrl || req.url;
+      //   return res.redirect('/caminio/login');
+      // }
       
     }
 
