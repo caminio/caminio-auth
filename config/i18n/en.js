@@ -35,6 +35,7 @@ module.exports = function( t ){
   t.username_email = 'Username';
   t.password = 'Password';
   t.login = 'Login';
+  t.send_email = 'Send email';
   t.forgotten_password = 'Forgotten password?';
   t.enter_email = 'Email address';
   t.remember_your_email = 'If you remember your Email address, you can request a link to reset your password.';
