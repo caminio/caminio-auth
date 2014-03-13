@@ -1,0 +1,3 @@
+0.0.2
+  - removed restriction for domain names to be valid fqdn and
+  - added fqdn field which is either passed in by the user or auto-generated on creation (from name)

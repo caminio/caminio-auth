@@ -8,7 +8,9 @@
  *
  */
 
-var _       = require('lodash');
+var _           = require('lodash');
+var inflection  = require('inflection');
+var join        = require('path').join;
 
 module.exports = DomainModel;
 
@@ -24,8 +26,10 @@ function DomainModel( caminio, mongoose ){
   var schema = new mongoose.Schema({
       name: { type: String, 
               required: true,
+              index: { unique: true } },
+      fqdn: { type: String, index: { unique: true },
+              required: true,
               lowercase: true,
-              index: { unique: true },
               validate: [ DomainNameValidator, 'invalid_domain_name' ] },
       title: String, // could be used to say 'TASTENWERK e.U.'
       users: [ { type: ObjectId, ref: 'User' } ],
@@ -85,6 +89,18 @@ function DomainModel( caminio, mongoose ){
     'updatedBy'
   ]);
 
+  schema.pre('validate', function(next){
+    if( this.fqdn && this.fqdn.length > 0 )
+      return next();
+    this.fqdn = this.name.replace(/ /g,'-').replace(/[^A-Za-z0-9-]/g,'');
+    this.fqdn = inflection.underscore( this.fqdn );
+    if( !DomainNameValidator( this.fqdn ) )
+      this.fqdn += '.camin.io';
+    next();
+  });
+
+  schema.methods.getContentPath = getContentPath;
+
   return schema;
 
   /**
@@ -97,7 +113,7 @@ function DomainModel( caminio, mongoose ){
    */
   function DomainNameValidator( val ){
     if( !val ) return false;
-    return val.match(/^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[\.]{0,1}[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/);
+    return val.match(/^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[\.]{0,1}[a-zA-Z0-9][a-zA-Z0-9-_]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/);
   }
   /**
    *
@@ -165,6 +181,21 @@ function DomainModel( caminio, mongoose ){
     });
 
     return this._allowedArr;
+  }
+
+  /**
+   * returns the content path for this domain
+   * the content path is assembled together with
+   * the contentPath set up in config/site.js
+   * and the domain's fqdn
+   */
+  function getContentPath(){
+    var pth = process.cwd();
+    if( caminio.config.site && caminio.config.site.contentPath )
+      pth = join( pth, caminio.config.site.contentPath )
+    else
+      pth = join( pth, 'content' );
+    return join( pth, this.fqdn.replace(/[^A-Za-z0-9-_]/g,'_') );
   }
 
 }

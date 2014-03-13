@@ -45,6 +45,34 @@ describe('Domain', function(){
 
     });
 
+    describe('auto generates an fqdn', function(){
+
+      it('has fqdn set before validation', function( done ){
+        var domain = new caminio.models.Domain({ name: 'Test Company' });
+        domain.validate( function(err){
+          console.log(err);
+          expect( err ).to.be.undefined;
+          expect( domain.fqdn ).to.eql('test-company.camin.io');
+          done();
+        });
+      });
+
+    });
+
+
+    describe('content path of domain (images/webpages)', function(){
+
+      it('#getContentPath', function( done ){
+        var domain = new caminio.models.Domain({ name: 'Test Company' });
+        domain.validate( function(err){
+          expect( domain.getContentPath() ).to.eql( process.cwd()+'/test/support/content/test-company_camin_io' );
+          done();
+        });
+      });
+
+    });
+
+
   });
   
 
