@@ -167,6 +167,7 @@ function DomainModel( caminio, mongoose ){
       _.each( gear.applications, function( appDef ){
         var buildAppDef = { name: appDef.name };
         buildAppDef.icon = appDef.icon || 'fa-'+buildAppDef.name.toLowerCase();
+        buildAppDef.color = appDef.color;
         buildAppDef.path = appDef.path || '/caminio/'+appDef.name;
         buildAppDef.admin = appDef.admin || false;
         buildAppDef.su = appDef.su || false;

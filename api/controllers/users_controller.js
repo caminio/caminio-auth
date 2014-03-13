@@ -224,6 +224,8 @@ module.exports = function UsersController( caminio, policies, middleware ){
         req.user[i] = req.body.user[i];
     }
 
+    req.user.generateConfirmationKey();
+
     req.user.save( function( err ){
       if( err ){ 
         if( err.name && err.name === 'ValidationError' )
@@ -241,8 +243,8 @@ module.exports = function UsersController( caminio, policies, middleware ){
   function sendCredentials( req, res, next ){
     caminio.mailer.send(
       req.user.email,
-      req.i18n.t('auth.mailer.subject_reset_password'), 
-      'users/send_credentials', 
+      req.i18n.t('auth.mailer.subject_pwd_changed'), 
+      'users/password_changed', 
       { 
         locals: {
           welcome: true,

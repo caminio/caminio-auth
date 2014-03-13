@@ -15,12 +15,14 @@ module.exports = function( t ){
   t.auth.unknown_email = 'The email address __email__ is not known to this system.';
   t.auth.mailer = t.auth.mailer || {};
   t.auth.mailer.subject_reset_password = 'Reset password request';
+  t.auth.mailer.subject_pwd_changed = 'Your password has been changed';
   t.auth.link_has_been_sent = 'An email has been sent to __email__. Please check your inbox';
   t.auth.security_transgression = 'Fatal security transgression!';
 
   t.setup = t.setup || {};
   t.setup.title = 'Initial setup';
   t.setup.desc = 'This is the first time you launch this application. You should start with creating an administrator account';
+  t.setup.name = 'Your organization name';
   t.setup.choose_email = 'Administrator\'s email address';
   t.setup.choose_pwd = 'Administrator\'s password';
   t.setup.domain_name = 'Domain name';
