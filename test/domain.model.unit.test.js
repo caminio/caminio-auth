@@ -50,7 +50,6 @@ describe('Domain', function(){
       it('has fqdn set before validation', function( done ){
         var domain = new caminio.models.Domain({ name: 'Test Company' });
         domain.validate( function(err){
-          console.log(err);
           expect( err ).to.be.undefined;
           expect( domain.fqdn ).to.eql('test-company.camin.io');
           done();
