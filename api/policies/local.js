@@ -24,10 +24,11 @@ module.exports = function( caminio ){
     function(username, password, done) {
       caminio.models.User.findOne({ email: username })
       .exec( function( err, user ){
+
         if( err ){ caminio.logger.error(err); return done(err); }
-        if( !user ){ return done(null, false, { message: 'user_unknown' }); }
+        if( !user ){ return done(null, false, { message: caminio.i18n.t('user_unknown') }); }
         if( !user.authenticate( password ) )
-          return done( null, false, { message: 'authentication_failed' });        
+          return done( null, false, { message: caminio.i18n.t('authentication_failed') });        
         user.update({ lastLoginAt: new Date(), lastRequestAt: new Date()}, function( err ){
           if( err ){ return done(err); }
           done( null, user );

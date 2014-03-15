@@ -43,7 +43,6 @@ module.exports = function( t ){
   t.remember_your_email = 'If you remember your Email address, you can request a link to reset your password.';
   t.request_link = 'Request link';
   t.user_unknown = 'Login failed! - User unkown';
-  t.authentication_failed = 'Login failed!';
   t.toggle_sidebar = 'Toggle sidebar';
   t.logout = 'Logout';
 

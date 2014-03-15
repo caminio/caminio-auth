@@ -79,7 +79,8 @@ function DomainModel( caminio, mongoose ){
     'updatedAt',
     'updatedBy',
     'lockedAt',
-    'lockedBy'
+    'lockedBy',
+    'normalizedFQDN'
   ];
 
   // do population on autorest show
@@ -89,7 +90,9 @@ function DomainModel( caminio, mongoose ){
     'updatedBy'
   ]);
 
-  schema.pre('validate', function(next){
+  schema.pre('validate', setupFQDN);
+
+  function setupFQDN( next ){
     if( this.fqdn && this.fqdn.length > 0 )
       return next();
     this.fqdn = this.name.replace(/ /g,'-').replace(/[^A-Za-z0-9-]/g,'');
@@ -97,7 +100,21 @@ function DomainModel( caminio, mongoose ){
     if( !DomainNameValidator( this.fqdn ) )
       this.fqdn += '.camin.io';
     next();
+  }
+
+  schema.pre('save', setupPreferences);
+
+  function setupPreferences( next ){
+    this.preferences.quota = this.preferences.quota || 100 * 1000 * 1000;
+    this.preferences.uploadLimit = this.preferences.uploadLimit || 5 * 1000 * 1000;
+    this.preferences.isCaminioHosted = true;
+    next();
+  }
+
+  schema.virtual('normalizedFQDN').get( function(){
+    return this.fqdn.replace(/[^A-Za-z0-9-_]/g,'_');
   });
+
 
   schema.methods.getContentPath = getContentPath;
 
@@ -196,7 +213,7 @@ function DomainModel( caminio, mongoose ){
       pth = join( pth, caminio.config.site.contentPath )
     else
       pth = join( pth, 'content' );
-    return join( pth, this.fqdn.replace(/[^A-Za-z0-9-_]/g,'_') );
+    return join( pth, this.normalizedFQDN );
   }
 
 }

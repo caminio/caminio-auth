@@ -7,6 +7,8 @@ module.exports = function UsersController( caminio, policies, middleware ){
   var User          = caminio.models.User;
   var Domain        = caminio.models.Domain;
   var util          = require('caminio/util');
+  var fs            = require('fs');
+  var join          = require('path').join;
 
   return {
 
@@ -73,16 +75,29 @@ module.exports = function UsersController( caminio, policies, middleware ){
         res.json( req.domain );
       }],
 
-      'destroy': [
-        getDomain,
-        requireSuperUserOrOwner,
-        destroyUsers,
-        destroyDomain,
-        function( req, res ){
-          req.session.camDomainId = null;
-          res.json(200, { meta: { affectedUsers: req.affectedUsers }});
-        }
-      ]
+    'destroy': [
+      getDomain,
+      requireSuperUserOrOwner,
+      destroyUsers,
+      destroyDomain,
+      function( req, res ){
+        req.session.camDomainId = null;
+        res.json(200, { meta: { affectedUsers: req.affectedUsers }});
+      }
+    ],
+
+    /**
+     * serve static files in case of development mode;
+     */
+    'preview': [
+      getDomain,
+      function( req, res ){
+        var filename = join(res.locals.currentDomain.getContentPath(), 'public', 'files', req.param('file'));
+        console.log('filename', filename);
+        if( !fs.existsSync( filename ) )
+          return res.send(404, 'File not found');
+        return res.sendfile( filename );
+      }]
 
   };
 
