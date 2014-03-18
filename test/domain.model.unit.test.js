@@ -103,6 +103,16 @@ describe('Domain', function(){
         });
       });
 
+      it('#preferences.availableLangs', function( done ){
+        var domain = new caminio.models.Domain({ name: 'Test Company5', lang: 'de' });
+        domain.save( function(err){
+          expect( err ).to.be.null;
+          expect( domain.preferences ).to.have.property('availableLangs');
+          expect( domain.preferences.availableLangs ).to.eql(['en','de']);
+          done();
+        });
+      });
+
     });
 
 

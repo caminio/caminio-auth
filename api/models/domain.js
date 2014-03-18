@@ -107,6 +107,7 @@ function DomainModel( caminio, mongoose ){
   function setupPreferences( next ){
     this.preferences.quota = this.preferences.quota || 100 * 1000 * 1000;
     this.preferences.uploadLimit = this.preferences.uploadLimit || 5 * 1000 * 1000;
+    this.preferences.availableLangs = ['en', this.lang];
     this.preferences.isCaminioHosted = true;
     next();
   }
