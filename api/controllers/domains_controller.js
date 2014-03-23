@@ -93,11 +93,26 @@ module.exports = function UsersController( caminio, policies, middleware ){
       getDomain,
       function( req, res ){
         var filename = join(res.locals.currentDomain.getContentPath(), 'public', 'files', req.param('file'));
-        console.log('filename', filename);
         if( !fs.existsSync( filename ) )
           return res.send(404, 'File not found');
         return res.sendfile( filename );
-      }]
+      }],
+
+    /**
+     * serve static files in case of development mode;
+     */
+    'scripts': [
+      getDomain,
+      function( req, res ){
+        var filename = join(res.locals.currentDomain.getContentPath(), 'layouts', 
+                            req.param('name'), 
+                            'javascripts', 
+                            req.param('folder'), 
+                            req.param('file'));
+        if( !fs.existsSync( filename ) )
+          return res.send(404, 'File not found');
+        return res.sendfile( filename );
+      }],
 
   };
 
