@@ -206,7 +206,7 @@ module.exports = function AuthController( caminio, policies, middleware ){
       { 
         locals: { 
           user: req.user,
-          url: (req.protocol + "://" + req.get('host') + '/caminio/accounts/' + req.user.id + '/reset/' + req.user.confirmation.key)
+          url: (caminio.config.hostname + '/caminio/accounts/' + req.user.id + '/reset/' + req.user.confirmation.key)
         } 
       },
       function( err ){
