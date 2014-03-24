@@ -303,7 +303,7 @@ function UserModel( caminio, mongoose ){
       return [ false, 'too_short' ];
     if( confirm_pwd && confirm_pwd !== pwd )
       return [ false, 'confirmation_missmatch' ];
-    if( !pwd.match(/[A-Z]+[a-z]+[0-9]+/) )
+    if( !pwd.match(/[A-Za-z0-9]+/) )
       return [ false, 'requirements_not_met' ];
     return [ true ];
   }
