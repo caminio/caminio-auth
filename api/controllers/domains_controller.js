@@ -164,6 +164,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
     Domain.create({
       name: req.body.domain.name,
       title: req.body.domain.title,
+      fqdn: req.body.domain.fqdn,
       description: req.body.domain.description,
       owner: req.user }, function( err, domain ){
         if( err && err.name && err.name === 'ValidationError' )
