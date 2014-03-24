@@ -29,7 +29,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
     'create': [
       policies.userSignup,
       createUser,
-      //sendWelcome,
+      sendWelcome,
       function(req,res){
         res.json({ user: req.user });
       }],
@@ -60,7 +60,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
     'update': [
       getUserById,
       updateUser,
-      //sendCredentials,
+      sendCredentials,
       function(req,res){
         res.json({ user: req.user });
       }
@@ -275,7 +275,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
           user: req.user,
           domain: res.locals.currentDomain,
           creator: res.locals.currentUser,
-          url: ( caminio.config.hostname + '/caminio')
+          url: ( caminio.config.hostname + '/caminio/accounts/' + req.user.id + '/reset/' + req.user.confirmation.key)
         } 
       },
       function( err ){

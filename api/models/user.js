@@ -152,12 +152,16 @@ function UserModel( caminio, mongoose ){
    *
    * @method generateConfirmationKey
    */
-  schema.method('generateConfirmationKey', function() {
+  schema.method('generateConfirmationKey', _generateConfirmationKey);
+
+  schema.pre('save', function( next ){ this.generateConfirmationKey(); next(); });
+
+  function _generateConfirmationKey(){
     this.confirmation.key = caminioUtil.uid(8);
     this.confirmation.expires = new Date()+1800*1000;
     this.confirmation.tries = this.confirmation.tries || 0;
     this.confirmation.tries += 1;
-  });
+  }
 
   /**
    * returns if password meets requirements
