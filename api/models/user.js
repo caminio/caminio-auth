@@ -154,7 +154,11 @@ function UserModel( caminio, mongoose ){
    */
   schema.method('generateConfirmationKey', _generateConfirmationKey);
 
-  schema.pre('save', function( next ){ this.generateConfirmationKey(); next(); });
+  schema.pre('save', function( next ){ 
+    if( !this.confirmation.expires || this.confirmation.expires < (new Date() - 1200) )
+      this.generateConfirmationKey(); 
+    next();
+  });
 
   function _generateConfirmationKey(){
     this.confirmation.key = caminioUtil.uid(8);

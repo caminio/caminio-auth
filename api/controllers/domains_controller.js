@@ -68,6 +68,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
       findUser,
       createUserIfNotFound,
       createDomain,
+      sendWelcome,
       updateCamDomainInUser,
       function(req,res){
         if( req.header('namespaced') )
@@ -145,7 +146,9 @@ module.exports = function UsersController( caminio, policies, middleware ){
     if( req.user )
       return next();
     User.create({ 
-      email: req.body.domain.user.email, 
+      firstname: req.body.domain.user.firstname,
+      lastname: req.body.domain.user.lastname,
+      email: req.body.domain.user.email,
       password: req.body.domain.user.password || (new Date()).getTime().toString()}, function( err, user ){
         if( err && err.name && err.name === 'ValidationError' )
           return res.json( 422, util.formatErrors(err) );
@@ -227,6 +230,30 @@ module.exports = function UsersController( caminio, policies, middleware ){
       req.domain = domain;
       next();
     });
+  }
+
+  /**
+   * @method sendWelcome
+   * @private
+   */
+  function sendWelcome( req, res, next ){
+    caminio.mailer.send(
+      req.user.email,
+      req.i18n.t('auth.mailer.subject_welcome'), 
+      'users/welcome', 
+      { 
+        locals: {
+          welcome: true,
+          user: req.user,
+          domain: res.locals.currentDomain,
+          creator: res.locals.currentUser,
+          url: ( caminio.config.hostname + '/caminio/accounts/' + req.user.id + '/reset/' + req.user.confirmation.key)
+        } 
+      },
+      function( err ){
+        if( err ){ return res.json(err); }
+        next();
+      });
   }
 
 };
