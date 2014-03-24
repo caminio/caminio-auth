@@ -1,24 +1,18 @@
 module.exports = function( t ){
 
-  t.authentication_failed = 'Authentication failed!';
-  t.insufficent_rights = 'Insufficent privileges!';
+  t.authentication_failed = 'Authentifizierung fehlgeschlagen!';
+  t.insufficent_rights = 'Unzureichende Rechte!';
 
-  t.user_unknown = 'Authentication failed';
+  t.user_unknown = 'Authentifizierung fehlgeschlagen';
   t.auth = t.auth || {};
-  t.auth.title = 'Login required';
-  t.auth.email_address = 'Email address';
-  t.auth.password = 'Your password';
-  t.auth.confirm_password = 'Re-enter password';
-  t.auth.enter_new_password = 'Enter your new password';
-  t.auth.confirmation_missmatch = 'Confirmation key missmatch';
-  t.back_to_login = 'Back to login';
-  t.auth.unknown_email = 'The email address __email__ is not known to this system.';
+  t.auth.title = 'Login erforderlich';
+  t.auth.email_address = 'Email addresse';
   t.auth.mailer = t.auth.mailer || {};
-  t.auth.mailer.subject_reset_password = 'Reset password request';
-  t.auth.mailer.subject_pwd_changed = 'Your password has been changed';
-  t.auth.mailer.subject_welcome = 'Welcome on caminio!';
-  t.auth.link_has_been_sent = 'An email has been sent to __email__. Please check your inbox';
-  t.auth.security_transgression = 'Fatal security transgression!';
+  t.auth.mailer.subject_reset_password = 'Passwort zurücksetzen';
+  t.auth.mailer.subject_pwd_changed = 'Passwort wurde geändert';
+  t.auth.mailer.subject_welcome = 'Willkommen auf caminio!';
+  t.auth.link_has_been_sent = 'Eine Email wurde an __email__ versendet';
+  t.auth.security_transgression = 'Zugriffsrechteverletzung!';
 
   t.setup = t.setup || {};
   t.setup.title = 'Initial setup';

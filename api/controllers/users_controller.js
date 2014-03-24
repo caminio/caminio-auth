@@ -29,7 +29,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
     'create': [
       policies.userSignup,
       createUser,
-      sendCredentials,
+      sendWelcome,
       function(req,res){
         res.json({ user: req.user });
       }],
@@ -251,7 +251,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
           user: req.user,
           domain: res.locals.currentDomain,
           creator: res.locals.currentUser,
-          url: (req.protocol + "://" + req.get('host') + '/caminio/accounts/' + req.user.id + '/reset/' + req.user.confirmation.key)
+          url: ( caminio.config.hostname + '/caminio/accounts/' + req.user.id + '/reset/' + req.user.confirmation.key)
         } 
       },
       function( err ){
@@ -260,6 +260,29 @@ module.exports = function UsersController( caminio, policies, middleware ){
       });
   }
 
+  /**
+   * @method sendWelcome
+   * @private
+   */
+  function sendWelcome( req, res, next ){
+    caminio.mailer.send(
+      req.user.email,
+      req.i18n.t('auth.mailer.subject_welcome'), 
+      'users/welcome', 
+      { 
+        locals: {
+          welcome: true,
+          user: req.user,
+          domain: res.locals.currentDomain,
+          creator: res.locals.currentUser,
+          url: ( caminio.config.hostname + '/caminio')
+        } 
+      },
+      function( err ){
+        if( err ){ return res.json(err); }
+        next();
+      });
+  }
   /**
    * @method getUsersByCamDomain
    * @private
