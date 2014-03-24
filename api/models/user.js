@@ -299,6 +299,8 @@ function UserModel( caminio, mongoose ){
    * @method checkPassword
    */
   function checkPassword(pwd, confirm_pwd){
+    if( !pwd || !confirm_pwd || pwd.length < 1 || confirm_pwd.length < 1 )
+      return false;
     if( !pwd || pwd.length < 6 )
       return [ false, 'too_short' ];
     if( confirm_pwd && confirm_pwd !== pwd )
