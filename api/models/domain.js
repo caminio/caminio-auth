@@ -62,6 +62,7 @@ function DomainModel( caminio, mongoose ){
   
   schema.publicAttributes = [
     'name',
+    'fqdn',
     'title',
     'lang',
     'users',
