@@ -34,6 +34,9 @@ function DomainModel( caminio, mongoose ){
       title: String, // could be used to say 'TASTENWERK e.U.'
       users: [ { type: ObjectId, ref: 'User' } ],
       lang: { type: String, default: 'en' },
+      usersQuota: { type: Number, default: 1 },
+      diskQuotaM: { type: Number, default: 5 },
+      diskUploadLimitM: { type: Number, default: 5 },
       groups: [ { type: ObjectId, ref: 'Group' } ],
       owner: { type: ObjectId, ref: 'User' },
       selectedApps: { type: mongoose.Schema.Types.Mixed, default: {} },
@@ -79,6 +82,9 @@ function DomainModel( caminio, mongoose ){
     'updatedBy',
     'lockedAt',
     'lockedBy',
+    'usersQuota',
+    'diskQuotaM',
+    'diskUploadLimitM',
     'normalizedFQDN'
   ];
 
