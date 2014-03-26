@@ -71,50 +71,6 @@ describe('Domain', function(){
 
     });
 
-    describe('preference default setup helpers', function(){
-
-      it('#preferences.quota', function( done ){
-        var domain = new caminio.models.Domain({ name: 'Test Company2' });
-        domain.save( function(err){
-          expect( err ).to.be.null;
-          expect( domain.preferences ).to.have.property('quota');
-          expect( domain.preferences.quota ).to.eql( 100 * 1000 * 1000 );
-          done();
-        });
-      });
-
-      it('#preferences.uploadLimit', function( done ){
-        var domain = new caminio.models.Domain({ name: 'Test Company3' });
-        domain.save( function(err){
-          expect( err ).to.be.null;
-          expect( domain.preferences ).to.have.property('uploadLimit');
-          expect( domain.preferences.uploadLimit ).to.eql( 5 * 1000 * 1000 );
-          done();
-        });
-      });
-
-      it('#preferences.isCaminioHosted', function( done ){
-        var domain = new caminio.models.Domain({ name: 'Test Company4' });
-        domain.save( function(err){
-          expect( err ).to.be.null;
-          expect( domain.preferences ).to.have.property('isCaminioHosted');
-          expect( domain.preferences.isCaminioHosted ).to.be.true;
-          done();
-        });
-      });
-
-      it('#preferences.availableLangs', function( done ){
-        var domain = new caminio.models.Domain({ name: 'Test Company5', lang: 'de' });
-        domain.save( function(err){
-          expect( err ).to.be.null;
-          expect( domain.preferences ).to.have.property('availableLangs');
-          expect( domain.preferences.availableLangs ).to.eql(['en','de']);
-          done();
-        });
-      });
-
-    });
-
 
   });
   

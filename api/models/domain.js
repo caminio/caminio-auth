@@ -36,8 +36,7 @@ function DomainModel( caminio, mongoose ){
       lang: { type: String, default: 'en' },
       groups: [ { type: ObjectId, ref: 'Group' } ],
       owner: { type: ObjectId, ref: 'User' },
-      selectedApps: { type: mongoose.Schema.Types.Mixed, default: {} }, 
-      preferences: { type: mongoose.Schema.Types.Mixed, default: {} },
+      selectedApps: { type: mongoose.Schema.Types.Mixed, default: {} },
       allowedAppNames: { type: Array, default: ['admin'] },
       createdAt:{ type: Date, default: Date.now },
       createdBy: { type: ObjectId, ref: 'User' },
@@ -67,7 +66,6 @@ function DomainModel( caminio, mongoose ){
     'lang',
     'users',
     'owner',
-    'preferences',
     'locked',
     'created',
     'updated',
@@ -103,23 +101,9 @@ function DomainModel( caminio, mongoose ){
     next();
   }
 
-  schema.pre('save', setupPreferences);
-
-  function setupPreferences( next ){
-    this.preferences.diskQuota = this.preferences.diskQuota || 50;
-    this.preferences.usersQuota = this.preferences.usersQuota || 1;
-    this.preferences.uploadLimit = this.preferences.uploadLimit || 5;
-    this.preferences.availableLangs = [this.lang];
-    if( this.preferences.availableLangs.indexOf('en') < 0 )
-      this.preferences.availableLangs.unshift('en');
-    this.preferences.isCaminioHosted = true;
-    next();
-  }
-
   schema.virtual('normalizedFQDN').get( function(){
     return this.fqdn.replace(/[^A-Za-z0-9-_]/g,'_');
   });
-
 
   schema.methods.getContentPath = getContentPath;
 

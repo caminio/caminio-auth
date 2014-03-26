@@ -300,12 +300,12 @@ function UserModel( caminio, mongoose ){
    */
   function checkPassword(pwd, confirm_pwd){
     if( !pwd || !confirm_pwd || pwd.length < 1 || confirm_pwd.length < 1 )
-      return false;
+      return [ false, 'too_short'];
     if( !pwd || pwd.length < 6 )
       return [ false, 'too_short' ];
     if( confirm_pwd && confirm_pwd !== pwd )
       return [ false, 'confirmation_missmatch' ];
-    if( !pwd.match(/[A-Za-z0-9]+/) )
+    if( !pwd.match(/((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,60})/) )
       return [ false, 'requirements_not_met' ];
     return [ true ];
   }
