@@ -134,7 +134,7 @@ module.exports = function AuthController( caminio, policies, middleware ){
    */
   function doInitialSetupCreateUser( req, res, next ){
     if( !req.camDomain ){ return next('no domain could be found. But it should have been created.'); }
-      var check = User.checkPassword( req.body.password );
+      var check = User.checkPassword( req.body.password, req.body.password );
 
     if( !check[0] ){
       req.flash('error', req.i18n.t('user.errors.'+check[1]));
