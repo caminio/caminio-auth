@@ -36,6 +36,7 @@ function UserModel( caminio, mongoose ){
     encryptedPassword: String,
     salt: {type: String},
     preferences: { type: Mixed, default: {} },
+    apiEnabled: { type: Boolean, default: false, public: true },
     //messages: [ MessageSchema ],
     lang: { type: String, default: 'en' },
     email: { type: String, 

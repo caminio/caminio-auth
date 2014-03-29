@@ -19,6 +19,7 @@ module.exports.routes = {
   'GET /caminio/domains/:id/javascripts/:name/:folder/:file': 'DomainsController#scripts',
 
   'autorest /caminio/domains': 'Domain',
+  'autorest /caminio/clients': 'Client',
 
   '/caminio/initial_setup': 'Auth::V1::AuthController#setup',
   'POST /caminio/initial_setup': 'Auth::V1::AuthController#do_setup',

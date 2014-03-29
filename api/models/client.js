@@ -26,24 +26,23 @@ module.exports = function ClientModel( caminio, mongoose ){
   var schema = new mongoose.Schema({
     secret: {
       type: String,
-      required: true
+      required: true,
+      public: true
     },
+    name: { type: String, public: true },
     user: {
       type: ObjectId,
       required: true,
-      ref: 'User'
+      ref: 'User',
+      public: true
     },
-    expires: {
-      at: {
-        type: Date
-      }
-    },
-    scope: { type: String, default: '*' }
+    expiresAt: { type: Date, public: true },
+    scope: { type: String, default: '*', public: true }
   });
 
   schema.path('secret').default( function(){ return util.uid(8); } );
-  schema.path('expires.at').default( function(){ return new Date() + 1000 * 3600 * 24 * 31 * 3; } );
+  //schema.path('expiresAt').default( function(){ return new Date() + 1000 * 3600 * 24 * 31 * 3; } );
 
   return schema;
 
-}
+};
