@@ -127,7 +127,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
             ' (',req.user.fullName,') IP:',
             req.headers['x-forwarded-for'] || req.connection.remoteAddress );  
         });
-        req.flash('info', req.i18n.t('user.password_saved'));
+        req.flash('info', req.i18n.t('user.password_reset_saved', { email: req.user.email }));
         next();
       });
     });
