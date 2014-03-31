@@ -127,7 +127,8 @@ module.exports = function UsersController( caminio, policies, middleware ){
             ' (',req.user.fullName,') IP:',
             req.headers['x-forwarded-for'] || req.connection.remoteAddress );  
         });
-        req.flash('info', req.i18n.t('user.password_saved'));
+        req.passwordChanged = true;
+        req.flash('info', req.i18n.t('user.password_reset_saved', { email: req.user.email }));
         next();
       });
     });
@@ -209,15 +210,20 @@ module.exports = function UsersController( caminio, policies, middleware ){
     if( !('user' in req.body) )
       return res.json(400,{ error: 'missing_model_name_in_body', expected: 'expected "user"', got: req.body });
 
-    if( req.body.user && req.body.user.autoPassword )
-      req.body.user.password = (Math.random()+(new Date().getTime().toString())).toString(36);
+    if( req.body.user.password && req.body.user.password.length > 1 ){
+      if( req.body.user.password !== req.body.user.passwordConfirmation )
+        return res.json( 422, { error: 'passwords_missmatch' });
+      var check = req.user.checkPassword( req.body.user.password, req.body.user.passwordConfirmation );
+      if( !check[0] )
+        return res.json( 422, { error: check[1] });
+      req.user.password = req.body.user.password;
+      req.passwordChanged = true;
+    }
 
     if( req.body.user && req.body.user.admin )
       req.body.user.role = 1;
     else
       req.body.user.role = 100;
-
-    req.body.user.camDomains = res.locals.currentDomain;
 
     for( var i in req.body.user ){
       if( i in req.user.constructor.schema.paths )
@@ -241,23 +247,24 @@ module.exports = function UsersController( caminio, policies, middleware ){
    * @private
    */
   function sendCredentials( req, res, next ){
-    caminio.mailer.send(
-      req.user.email,
-      req.i18n.t('auth.mailer.subject_pwd_changed'), 
-      'users/password_changed', 
-      { 
-        locals: {
-          welcome: true,
-          user: req.user,
-          domain: res.locals.currentDomain,
-          creator: res.locals.currentUser,
-          url: ( caminio.config.hostname + '/caminio/accounts/' + req.user.id + '/reset/' + req.user.confirmation.key)
-        } 
-      },
-      function( err ){
-        if( err ){ return res.json(err); }
-        next();
-      });
+    if( req.passwordChanged )
+      caminio.mailer.send(
+        req.user.email,
+        req.i18n.t('auth.mailer.subject_pwd_changed'), 
+        'users/password_changed', 
+        { 
+          locals: {
+            welcome: true,
+            user: req.user,
+            domain: res.locals.currentDomain,
+            creator: res.locals.currentUser,
+            url: ( caminio.config.hostname + '/caminio/accounts/' + req.user.id + '/reset/' + req.user.confirmation.key)
+          } 
+        },
+        function( err ){
+          if( err ){ return res.json(err); }
+          next();
+        });
   }
 
   /**

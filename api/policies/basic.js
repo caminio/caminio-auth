@@ -25,7 +25,6 @@ module.exports = function( caminio ){
     { realm: (caminio.config.site ? caminio.config.site.name : 'Please authenticate' ) },
 
     function(username, password, done) {
-      console.log('here at basic auth');
       caminio.models.User.findOne({ email: username })
       .exec( function( err, user ){
         if( err ){ caminio.logger.error(err); return done(err); }

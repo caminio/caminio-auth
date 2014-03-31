@@ -1,6 +1,7 @@
 module.exports = function( t ){
 
   t.authentication_failed = 'Authentifizierung fehlgeschlagen!';
+  t.currently_logged_in = 'Dieses Konto ist momentan angemeldet!';
   t.insufficent_rights = 'Unzureichende Rechte!';
 
   t.user_unknown = 'Authentifizierung fehlgeschlagen';
