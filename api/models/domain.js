@@ -125,7 +125,7 @@ function DomainModel( caminio, mongoose ){
    */
   function DomainNameValidator( val ){
     if( !val ) return false;
-    return val.match(/^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[\.]{0,1}[a-zA-Z0-9][a-zA-Z0-9-_]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/);
+    return val.match(/^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[\.]{0,1}[a-zA-Z0-9][a-zA-Z0-9-_]{1,61}[a-zA-Z0-9]\.[a-zA-Z\.]{2,}$/);
   }
   /**
    *
