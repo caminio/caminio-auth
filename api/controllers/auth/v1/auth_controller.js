@@ -71,13 +71,14 @@ module.exports = function AuthController( caminio, policies, middleware ){
         }
       }],
 
-    'logout':
+    'logout':[
+      nullifyLastRequest,
       function( req, res ){
         req.logout();
         req.session.camDomainId = null;
         req.session.locale = null;
         res.redirect('/');
-      },
+      }]
 
     };
 
@@ -87,6 +88,18 @@ module.exports = function AuthController( caminio, policies, middleware ){
   function resetSession( req, res, next ){
     req.session.camDomainId = null;
     next();
+  }
+
+  function nullifyLastRequest( req, res, next ){
+    if( !req.user )
+      return next();
+    req.user.update({ lastRequestAt: null }, function( err ){
+      if( err ){ 
+        console.error(err);
+        return res.send(500, 'error when trying to log off'); 
+      }
+      next();
+    });
   }
 
   /**

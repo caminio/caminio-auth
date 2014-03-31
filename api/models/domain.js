@@ -203,11 +203,13 @@ function DomainModel( caminio, mongoose ){
    * and the domain's fqdn
    */
   function getContentPath(){
-    var pth = process.cwd();
-    if( caminio.config.site && caminio.config.site.contentPath )
-      pth = join( pth, caminio.config.site.contentPath )
+    var pth = '';
+    if( caminio.config.contentPath )
+      pth = join( pth, caminio.config.contentPath );
     else
-      pth = join( pth, 'content' );
+      pth = join( process.cwd(), 'content' );
+
+    console.log( join( pth, this.normalizedFQDN ) );
     return join( pth, this.normalizedFQDN );
   }
 
