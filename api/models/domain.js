@@ -209,7 +209,6 @@ function DomainModel( caminio, mongoose ){
     else
       pth = join( process.cwd(), 'content' );
 
-    console.log( join( pth, this.normalizedFQDN ) );
     return join( pth, this.normalizedFQDN );
   }
 
