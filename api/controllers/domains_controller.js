@@ -148,7 +148,9 @@ module.exports = function UsersController( caminio, policies, middleware ){
     User.create({ 
       firstname: req.body.domain.user.firstname,
       lastname: req.body.domain.user.lastname,
+      lang: req.body.domain.lang || 'en',
       email: req.body.domain.user.email,
+      role: 1,
       password: req.body.domain.user.password || (new Date()).getTime().toString()}, function( err, user ){
         if( err && err.name && err.name === 'ValidationError' )
           return res.json( 422, util.formatErrors(err) );
@@ -168,6 +170,11 @@ module.exports = function UsersController( caminio, policies, middleware ){
       name: req.body.domain.name,
       title: req.body.domain.title,
       fqdn: req.body.domain.fqdn,
+      allowedAppNames: req.body.domain.allowedAppNames,
+      lang: req.body.domain.lang,
+      usersQuota: req.body.domain.usersQuota || 1,
+      diskQuotaM: req.body.domain.diskQuotaM || 50,
+      diskUploadLimitM: req.body.domain.diskuploadLimitM || 5,
       description: req.body.domain.description,
       owner: req.user }, function( err, domain ){
         if( err && err.name && err.name === 'ValidationError' )
@@ -184,7 +191,8 @@ module.exports = function UsersController( caminio, policies, middleware ){
   function updateCamDomainInUser( req, res, next ){
     if( !req.user )
       return next();
-    req.user.camDomains = req.domain;
+    req.user.camDomains.push( req.domain._id );
+    req.user.role = 1;
     req.user.save( function( err ){
       if( err ){ return res.json(500, { error: 'server_error', details: err } ); }
       next();
