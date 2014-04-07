@@ -67,6 +67,17 @@ module.exports = function UsersController( caminio, policies, middleware ){
     ],
 
     /**
+     * send credentials again
+     * @method send_credentials
+     */
+    'resend_credentials': [
+      getUserById,
+      sendWelcome,
+      function(req,res){
+        res.json({ user: req.user });
+      }],
+
+    /**
      * do reset the user's password
      * @method do_reset
      */
