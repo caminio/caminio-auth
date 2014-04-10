@@ -34,6 +34,8 @@ function DomainModel( caminio, mongoose ){
       title: String, // could be used to say 'TASTENWERK e.U.'
       users: [ { type: ObjectId, ref: 'User' } ],
       lang: { type: String, default: 'en' },
+      currency: { type: String, default: 'EUR' },
+      vat: { type: String },
       usersQuota: { type: Number, default: 1 },
       diskQuotaM: { type: Number, default: 5 },
       diskUploadLimitM: { type: Number, default: 5 },
@@ -67,6 +69,8 @@ function DomainModel( caminio, mongoose ){
     'fqdn',
     'title',
     'lang',
+    'currency',
+    'vat',
     'users',
     'owner',
     'locked',
