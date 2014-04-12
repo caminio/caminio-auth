@@ -7,6 +7,7 @@ module.exports.routes = {
 
   '/caminio/login': 'Auth::V1::AuthController#login',
   'POST /caminio/login': 'Auth::V1::AuthController#do_login',
+  'POST /caminio/kick/:id': 'Auth::V1::AuthController#do_kick',
 
   '/caminio/reset_password': 'Auth::V1::AuthController#reset_password',
   'POST /caminio/reset_password': 'Auth::V1::AuthController#do_reset_password',

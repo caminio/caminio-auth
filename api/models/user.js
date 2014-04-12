@@ -56,6 +56,8 @@ function UserModel( caminio, mongoose ){
     lastLoginAt: Date,
     lastLoginIp: String,
     lastRequestAt: Date,
+    lastRequestIp: String,
+    lastRequestAgetn: String,
     createdAt: { type: Date, default: Date.now },
     createdBy: { type: ObjectId, ref: 'User' },
     updatedAt: { type: Date, default: Date.now },

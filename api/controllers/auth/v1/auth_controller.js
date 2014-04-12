@@ -78,7 +78,16 @@ module.exports = function AuthController( caminio, policies, middleware ){
         req.session.camDomainId = null;
         req.session.locale = null;
         res.redirect('/');
-      }]
+      }],
+
+    'do_kick': [
+      getUser,
+      nullifyLastRequest,
+      passport.authenticate('local', { 
+        successReturnToOrRedirect: caminio.config.session.redirectUrl || '/caminio',
+        failureRedirect: '/caminio/login',
+        failureFlash: true
+      })],
 
     };
 
@@ -93,7 +102,7 @@ module.exports = function AuthController( caminio, policies, middleware ){
   function nullifyLastRequest( req, res, next ){
     if( !req.user )
       return next();
-    req.user.update({ lastRequestAt: null }, function( err ){
+    req.user.update({ lastRequestAt: null, lastRequestIp: null, lastRequestAgent: null }, function( err ){
       if( err ){ 
         console.error(err);
         return res.send(500, 'error when trying to log off'); 
@@ -188,6 +197,14 @@ module.exports = function AuthController( caminio, policies, middleware ){
    */
   function findUser( req, res, next ){
     User.findOne({ email: req.param('email') }, function( err, user ){
+      if( err ){ return next( err ); }
+      req.user = user;
+      next();
+    });
+  }
+
+  function getUser( req, res, next ){
+    User.findOne({ _id: req.param('id') }, function( err, user ){
       if( err ){ return next( err ); }
       req.user = user;
       next();

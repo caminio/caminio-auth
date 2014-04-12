@@ -1,7 +1,8 @@
 module.exports = function( t ){
 
   t.authentication_failed = 'Authentication failed!';
-  t.currently_logged_in = 'This account is currently logged in!';
+  t.currently_logged_in = 'This account is currently logged in! You can kick the currently logged in user by logging in again and klick the "kick" <span class="hide kick-user">Kick</span> button. This will cause the current user to loose the ability to save their data.';
+  t.has_been_kicked = 'The account __name__ has been kicked off as requested';
   t.insufficent_rights = 'Insufficent privileges!';
 
   t.user_unknown = 'Authentication failed';
