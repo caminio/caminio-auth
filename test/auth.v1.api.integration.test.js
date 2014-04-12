@@ -76,6 +76,7 @@ describe('Auth integration', function(){
       test.agent.post( helper.url+'/login' )
       .send({ username: user.email, password: user.password })
       .end(function(err,res){
+        console.log('res', res.text);
         test.agent.get( helper.url )
         .end(function(err,res){
           expect(err).to.be.null;

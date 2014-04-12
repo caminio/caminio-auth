@@ -1,4 +1,3 @@
 module.exports.site = {
-  name: 'camin.io',
-  contentPath: 'test/support/content'
+  name: 'camin.io'
 };
