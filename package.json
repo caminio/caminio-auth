@@ -1,7 +1,7 @@
 {
   "name": "caminio-auth",
   "description": "authentication plugin (gear) for caminio",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "private": false,
   "author": "quaqua <quaqua@tastenwerk.com>",
   "keywords": [
@@ -32,7 +32,6 @@
     "grunt-mocha-test": "~0.8.2",
     "mongoose": "~3.8.4"
   },
-  "main": "lib/caminio.js",
   "scripts": {
     "test": "grunt test --verbose"
   },
