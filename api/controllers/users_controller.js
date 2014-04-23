@@ -66,6 +66,15 @@ module.exports = function UsersController( caminio, policies, middleware ){
       }
     ],
 
+    'change_password': [
+      getUserById,
+      checkOldAndUpdateUserPassword,
+      sendCredentials,
+      function(req,res){
+        res.json({ user: req.user });
+      }
+    ],
+
     /**
      * send credentials again
      * @method send_credentials
@@ -140,6 +149,30 @@ module.exports = function UsersController( caminio, policies, middleware ){
         });
         req.passwordChanged = true;
         req.flash('info', req.i18n.t('user.password_reset_saved', { email: req.user.email }));
+        next();
+      });
+    });
+  }
+
+  /**
+   * checks old password match and updates user's password
+   * @method checkOldAndUpdateUserPassword
+   */
+  function checkOldAndUpdateUserPassword(req,res,next){
+    if( !req.user.authenticate( req.body.oldPassword ) )
+      return res.json(403,{ error: 'password_missmatch'});
+    req.user.password = req.body.newPassword;
+    req.user.confirmation.key = null;
+    req.user.save( function( err ){
+      if( err ){ return next(err); }
+      req.user.populate('domains', function(err,user){
+        user.camDomains.forEach( function(domain){
+          caminio.audit.log( domain.name, 
+            'password has been changed for user',req.user.id,
+            ' (',req.user.fullName,') IP:',
+            req.headers['x-forwarded-for'] || req.connection.remoteAddress );  
+        });
+        req.passwordChanged = true;
         next();
       });
     });
@@ -276,6 +309,8 @@ module.exports = function UsersController( caminio, policies, middleware ){
           if( err ){ return res.json(err); }
           next();
         });
+    else
+      next();
   }
 
   /**
