@@ -19,7 +19,15 @@ module.exports = function UsersController( caminio, policies, middleware ){
     'index': [
       getUsersByCamDomain,
       function( req, res ){
-        res.json({ users: req.users });
+        var result = req.users;
+
+        if( req.header('namespaced') )
+          var result = { users: JSON.parse(JSON.stringify(req.users)) };
+
+          if( req.header('sideload') )
+            result = util.transformJSON( result, req.header('namespaced') );
+
+        res.json(result);
       }
     ],
 

@@ -18,10 +18,10 @@ module.exports = UserModel;
  */
 function UserModel( caminio, mongoose ){
   
-  var crypto      = require('crypto');
-  var ObjectId    = mongoose.Schema.Types.ObjectId;
-  var Mixed       = mongoose.Schema.Types.Mixed;
-  var caminioUtil = require('caminio/util');
+  var crypto          = require('crypto');
+  var ObjectId        = mongoose.Schema.Types.ObjectId;
+  var Mixed           = mongoose.Schema.Types.Mixed;
+  var caminioUtil     = require('caminio/util');
 
   //var MessageSchema = require('./_schemas/message.schema.js')( caminio, mongoose );
 
@@ -35,7 +35,9 @@ function UserModel( caminio, mongoose ){
     lastname: String,
     encryptedPassword: String,
     salt: {type: String},
+    remotePicUrl: { type: String, public: true },
     preferences: { type: Mixed, default: {} },
+    mediafiles: { type: Array, public: true },
     apiEnabled: { type: Boolean, default: false, public: true },
     //messages: [ MessageSchema ],
     lang: { type: String, default: 'en' },
@@ -109,6 +111,15 @@ function UserModel( caminio, mongoose ){
       } else
         this.name.first = name;
     });
+
+  schema.virtual('profilePic')
+    .get(function(){
+      if( this.mediafiles.length > 0 )
+        return '/caminio/domains/'+this.camDomains[0]._id+'/preview/'+this.mediafiles[0].name;
+      if( this.remotePicUrl )
+        return this.remotePicUrl;
+      return '/images/bot_128x128.png';
+    })
 
   /**
    *
