@@ -93,7 +93,8 @@ module.exports = function UsersController( caminio, policies, middleware ){
     'preview': [
       getDomain,
       function( req, res ){
-        var filename = join(res.locals.currentDomain.getContentPath(), 'public', 'files', req.param('file'));
+        var filename = join(res.locals.currentDomain.getContentPath(), 'public', 'files', req.originalUrl.split('preview/')[1]);
+        console.log('calc filename', req.param('file'), filename);
         if( !fs.existsSync( filename ) )
           return res.send(404, 'File not found');
         return res.sendfile( filename );
