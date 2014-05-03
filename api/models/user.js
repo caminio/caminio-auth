@@ -115,7 +115,7 @@ function UserModel( caminio, mongoose ){
   schema.virtual('profilePic')
     .get(function(){
       if( this.mediafiles.length > 0 )
-        return '/caminio/domains/'+this.camDomains[0]._id+'/preview/'+this.mediafiles[0].name;
+        return '/caminio/profile_pics/'+this._id;
       if( this.remotePicUrl )
         return this.remotePicUrl;
       return '/images/bot_128x128.png';
