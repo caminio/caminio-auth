@@ -11,6 +11,7 @@
 var _           = require('lodash');
 var inflection  = require('inflection');
 var join        = require('path').join;
+var fs          = require('fs');
 
 module.exports = DomainModel;
 
@@ -87,7 +88,9 @@ function DomainModel( caminio, mongoose ){
     'usersQuota',
     'diskQuotaM',
     'diskUploadLimitM',
-    'normalizedFQDN'
+    'normalizedFQDN',
+    'contentDirPkgVersion',
+    'contentPath'
   ];
 
   // do population on autorest show
@@ -114,6 +117,19 @@ function DomainModel( caminio, mongoose ){
   });
 
   schema.methods.getContentPath = getContentPath;
+
+  schema.virtual('contentPath')
+    .get(function(){
+      return getContentPath.call(this);
+    });
+
+  schema.virtual('contentDirPkgVersion')
+    .get(function(){
+      var pkgFile = join(this.contentPath, 'package.json');
+      if( fs.existsSync( pkgFile ) )
+        return JSON.parse(fs.readFileSync(pkgFile)).version;
+      return '';
+    });
 
   return schema;
 
