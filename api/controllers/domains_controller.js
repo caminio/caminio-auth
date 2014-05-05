@@ -28,8 +28,9 @@ module.exports = function UsersController( caminio, policies, middleware ){
                 domains[i] = domains[i].toObject();
                 owners.push( domains[i].owner );
                 domains[i].user = domains[i].owner._id.toString();
+                delete domains[i].owner;
               }
-              return res.json( { domains: domains, users: owners } );
+              return res.json( { domains: domains }); //, users: owners } );
             }
             return res.json( { domains: domains } );
           }
