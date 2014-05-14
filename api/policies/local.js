@@ -32,7 +32,9 @@ module.exports = function( caminio ){
           if( user.lastRequestAt && user.lastRequestAt > (new Date()) - caminio.config.session.timeout )
             return done( null, false, { message: caminio.i18n.t('currently_logged_in', {userId: user._id}) + '<span class="hide" data-user-id="'+user._id+'"></span>' });
         }
-        user.update({ lastLoginAt: new Date(), lastRequestAt: new Date()}, function( err ){
+        user.update({ lastSessionAt: user.lastLoginAt, 
+                    lastSessionIp: (user.lastLoginIp || ''),
+                    lastLoginAt: new Date(), lastRequestAt: new Date()}, function( err ){
           if( err ){ return done(err); }
           done( null, user );
         });

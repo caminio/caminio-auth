@@ -193,6 +193,9 @@ function DomainModel( caminio, mongoose ){
     if( this._allowedArr ) return this._allowedArr;
 
     var available = {};
+    var otherAppsFilename = join( process.cwd(), 'config/available_apps' );
+    var otherApps = fs.existsSync( otherAppsFilename ) ? require( otherAppsFilename ) : [];
+
     _.each( caminio.gears, function( gear ){
       _.each( gear.applications, function( appDef ){
         var buildAppDef = { name: appDef.name };
@@ -206,9 +209,18 @@ function DomainModel( caminio, mongoose ){
     });
 
     this._allowedArr = [];
+    var appNames = [];
     _.each( this.allowedAppNames, function( appName ){
-      if( appName in available )
+      if( appName in available ){
         self._allowedArr.push( available[appName] );
+        appNames.push( appName );
+      }
+    });
+    _.each( otherApps, function( app ){
+      if( app.name in available && !(app.name in appNames) ){
+        self._allowedArr.push( app );
+        appNames.push( app.name );
+      }
     });
 
     return this._allowedArr;

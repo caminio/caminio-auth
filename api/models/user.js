@@ -57,6 +57,8 @@ function UserModel( caminio, mongoose ){
     role: { type: Number, default: 100 },
     lastLoginAt: Date,
     lastLoginIp: String,
+    lastSessionAt: { type: Date, public: true },
+    lastSessionIp: { type: String, public: true },
     lastRequestAt: Date,
     lastRequestIp: String,
     lastRequestAgetn: String,
@@ -119,7 +121,17 @@ function UserModel( caminio, mongoose ){
       if( this.remotePicUrl )
         return this.remotePicUrl;
       return '/images/bot_128x128.png';
-    })
+    });
+
+  schema.virtual('profileUrl')
+    .get(function(){
+      return '/caminio/profiles#/' + this._id;
+    });
+
+  schema.virtual('profilePasswordUrl')
+    .get(function(){
+      return '/caminio/profiles#/passwd/' + this._id;
+    });
 
   /**
    *
@@ -327,9 +339,13 @@ function UserModel( caminio, mongoose ){
   schema.publicAttributes = [
     'firstname',
     'lastname',
+    'fullname',
     'lang',
     'camDomains',
     'email',
+    'profilePic',
+    'profileUrl',
+    'profilePasswordUrl',
     'lastLoginAt',
     'lastRequestAt',
     'superuser',

@@ -22,7 +22,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
         var result = req.users;
 
         if( req.header('namespaced') )
-          var result = { users: JSON.parse(JSON.stringify(req.users)) };
+          result = { users: JSON.parse(JSON.stringify(req.users)) };
 
           if( req.header('sideload') )
             result = util.transformJSON( result, req.header('namespaced') );
@@ -70,7 +70,14 @@ module.exports = function UsersController( caminio, policies, middleware ){
       updateUser,
       sendCredentials,
       function(req,res){
-        res.json({ user: req.user });
+        var result = req.user;
+        if( req.header('namespaced') )
+          result = { users: JSON.parse(JSON.stringify(result)) };
+
+        if( req.header('sideload') )
+          result = util.transformJSON( result, req.header('namespaced') );
+
+        res.json(result);
       }
     ],
 
