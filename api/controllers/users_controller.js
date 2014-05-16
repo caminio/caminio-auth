@@ -237,9 +237,6 @@ module.exports = function UsersController( caminio, policies, middleware ){
     if( req.body.user && req.body.user.autoPassword )
       req.body.user.password = (Math.random()+(new Date().getTime().toString())).toString(36);
 
-    if( req.body.user && req.body.user.admin )
-      req.body.user.role = 1;
-
     if( res.locals.currentDomain.lang )
       req.body.user.lang = res.locals.currentDomain.lang;
 
@@ -278,11 +275,6 @@ module.exports = function UsersController( caminio, policies, middleware ){
       req.user.password = req.body.user.password;
       req.passwordChanged = true;
     }
-
-    if( req.body.user && req.body.user.admin )
-      req.body.user.role = 1;
-    else
-      req.body.user.role = 100;
 
     for( var i in req.body.user ){
       if( i in req.user.constructor.schema.paths )
@@ -357,6 +349,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
    */
   function getUsersByCamDomain( req, res, next ){
     User.find({ camDomains: res.locals.currentDomain._id })
+        .sort({ 'lastname': 'asc' })
         .exec( function( err, users ){
           if( err ){ return res.json( 500, { error: 'server_error', details: err }); }
           req.users = users;

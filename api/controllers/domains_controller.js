@@ -20,7 +20,11 @@ module.exports = function DomainsController( caminio, policies, middleware ){
     'index': [
       requireSuperUser,
       function( req, res ){
-        Domain.find().populate('owner').exec( function( err, domains ){
+        Domain
+          .find()
+          .sort({ name: 'asc' })
+          .populate('owner')
+          .exec( function( err, domains ){
           if( err ){ return res.json( 500, { error: 'server_error', details: err }); }
           if( req.header('namespaced') ){
             if( req.header('sideload') ){
@@ -148,7 +152,6 @@ module.exports = function DomainsController( caminio, policies, middleware ){
       lastname: req.body.domain.user.lastname,
       lang: req.body.domain.lang || 'en',
       email: req.body.domain.user.email,
-      role: 1,
       password: req.body.domain.user.password || (new Date()).getTime().toString()}, function( err, user ){
         if( err && err.name && err.name === 'ValidationError' )
           return res.json( 422, util.formatErrors(err) );
@@ -190,7 +193,8 @@ module.exports = function DomainsController( caminio, policies, middleware ){
     if( !req.user )
       return next();
     req.user.camDomains.push( req.domain._id );
-    req.user.role = 1;
+    req.user.roles = req.user.roles || {};
+    req.user.roles[ req.domain._id ] = 100;
     req.user.save( function( err ){
       if( err ){ return res.json(500, { error: 'server_error', details: err } ); }
       next();

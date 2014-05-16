@@ -22,6 +22,7 @@ function UserModel( caminio, mongoose ){
   var ObjectId        = mongoose.Schema.Types.ObjectId;
   var Mixed           = mongoose.Schema.Types.Mixed;
   var caminioUtil     = require('caminio/util');
+  var _               = require('lodash');
 
   //var MessageSchema = require('./_schemas/message.schema.js')( caminio, mongoose );
 
@@ -55,6 +56,7 @@ function UserModel( caminio, mongoose ){
       tries: Number
     },
     role: { type: Number, default: 100 },
+    roles: { type: Mixed },
     lastLoginAt: Date,
     lastLoginIp: String,
     lastSessionAt: { type: Date, public: true },
@@ -242,21 +244,44 @@ function UserModel( caminio, mongoose ){
   schema.method('isAdmin', function(groupOrDomain){
     if( this.isSuperUser() )
       return true;
-    if( groupOrDomain instanceof caminio.models.Domain )
-      return groupOrDomain.owner.equals( this._id.toString() );
-    return this.role <= 5;
+    if( groupOrDomain instanceof caminio.models.Domain ){
+      if( groupOrDomain.owner.equals( this._id.toString() ) )
+        return true;
+      if( groupOrDomain._id in this.camDomains )
+        return this.roles[ groupOrDomain._id ] === 100;
+    }
+    return false;
   });
 
-  schema.virtual('admin').get(function(){
-    if( this.isSuperUser() )
+  schema.method('isEditor', function(groupOrDomain){
+    if( this.isAdmin( groupOrDomain ) )
       return true;
-    return this.role <= 5;
-  }).set(function(val){
-    if( val )
-      this.role = 1;
-    else
-      this.role = 100;
+    if( groupOrDomain instanceof caminio.models.Domain )
+      return this.roles[ groupOrDomain._id ] >= 60;
+    return false;
   });
+
+  //schema.virtual('admin').get(function(){
+  //  if( this.isSuperUser() )
+  //    return true;
+  //  return this.role <= 5;
+  //}).set(function(val){
+  //  if( val )
+  //    this.role = 1;
+  //  else
+  //    this.role = 100;
+  //});
+  //
+  //schema.virtual('editor').get(function(){
+  //  if( this.isSuperUser() )
+  //    return true;
+  //  return this.role <= 50;
+  //}).set(function(val){
+  //  if( val )
+  //    this.role = 50;
+  //  else
+  //    this.role = 100;
+  //});
 
   schema.virtual('superuser').get(function(){
     return this.isSuperUser();
@@ -349,7 +374,7 @@ function UserModel( caminio, mongoose ){
     'lastLoginAt',
     'lastRequestAt',
     'superuser',
-    'admin'
+    'roles'
   ];
 
   return schema;
