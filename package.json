@@ -1,7 +1,7 @@
 {
   "name": "caminio-auth",
   "description": "authentication plugin (gear) for caminio",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "private": false,
   "author": "quaqua <quaqua@tastenwerk.com>",
   "keywords": [
