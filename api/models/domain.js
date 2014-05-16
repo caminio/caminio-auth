@@ -38,6 +38,7 @@ function DomainModel( caminio, mongoose ){
       usersQuota: { type: Number, default: 1 },
       diskQuotaM: { type: Number, default: 5 },
       diskUploadLimitM: { type: Number, default: 5 },
+      isCaminioHosted: { type: Boolean, default: true, public: true },
       groups: [ { type: ObjectId, ref: 'Group' } ],
       owner: { type: ObjectId, ref: 'User' },
       selectedApps: { type: mongoose.Schema.Types.Mixed, default: {} },

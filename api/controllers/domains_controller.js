@@ -1,12 +1,13 @@
 /**
- * @class UsersController
+ * @class DomainsController
  */
-module.exports = function UsersController( caminio, policies, middleware ){
+module.exports = function DomainsController( caminio, policies, middleware ){
 
   var async         = require('async');
   var User          = caminio.models.User;
   var Domain        = caminio.models.Domain;
   var util          = require('caminio/util');
+  var mkdirp        = require('mkdirp');
   var fs            = require('fs');
   var join          = require('path').join;
 
@@ -66,6 +67,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
       createDomain,
       sendWelcome,
       updateCamDomainInUser,
+      createDomainDirectory,
       function(req,res){
         if( req.header('namespaced') )
           return res.json({ domain: req.domain });
@@ -258,6 +260,20 @@ module.exports = function UsersController( caminio, policies, middleware ){
         if( err ){ return res.json(err); }
         next();
       });
+  }
+
+  /**
+   * @method createDomainDirectory
+   * @private
+   */
+  function createDomainDirectory( req, res, next ){
+    if( !fs.existsSync( req.domain.getContentPath() ) )
+      mkdirp.sync( req.domain.getContentPath() )
+    if( fs.existsSync( join( req.domain.getContentPath(), '.settings.js' ) ) )
+      return next();
+    var tmplFileData = fs.readFileSync( join( __dirname, '..', '..', 'lib', 'templates', 'settings.js'), 'utf8' );
+    fs.writeFileSync( join( req.domain.getContentPath(), '.settings.js' ), tmplFileData );
+    next();  
   }
 
 };
