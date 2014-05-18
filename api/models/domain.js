@@ -8,6 +8,8 @@
  *
  */
 
+'use strict';
+
 var _           = require('lodash');
 var inflection  = require('inflection');
 var join        = require('path').join;
