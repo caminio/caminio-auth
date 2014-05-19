@@ -15,6 +15,11 @@ module.exports = function( t ){
   t.auth.link_has_been_sent = 'Eine Email wurde an __email__ versendet';
   t.auth.security_transgression = 'Zugriffsrechteverletzung!';
 
+  t.user = t.user || {};
+  t.user.errors = t.user.errors || {};
+  t.user.errors.too_short = 'Das ausgewählte Passwort ist zu kurz. Das Passwort muss aus mind. 6 Zeichen bestehen, davon mind. 1 Großbuchstabe, 1 Kleinbuchstage und eine Ziffer';
+  t.user.errors.requirements_not_met = 'Das ausgewählte Passwort erfüllt nicht alle Kriterien. Es muss aus mind. 6 Zeichen bestehen, davon mind. 1 Großbuchstabe, 1 Kleinbuchstage und eine Ziffer';
+
   t.setup = t.setup || {};
   t.setup.title = 'Initial setup';
   t.setup.desc = 'This is the first time you launch this application. You should start with creating an administrator account';

@@ -22,6 +22,11 @@ module.exports = function( t ){
   t.auth.link_has_been_sent = 'An email has been sent to __email__. Please check your inbox';
   t.auth.security_transgression = 'Fatal security transgression!';
 
+  t.user = t.user || {};
+  t.user.errors = t.user.errors || {};
+  t.user.errors.too_short = 'The chosen password is too short. Please use 6 characters at least. Please ensure, you have at least one uppercase, one lowercase character and one digit';
+  t.user.errors.requirements_not_met = 'The chosen password does not meet all requirements. Please use at least one uppercase, one lowercase character and one digit, in total at least 6 characters';
+
   t.setup = t.setup || {};
   t.setup.title = 'Initial setup';
   t.setup.desc = 'This is the first time you launch this application. You should start with creating an administrator account';

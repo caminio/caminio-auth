@@ -36,10 +36,19 @@ module.exports = function UsersController( caminio, policies, middleware ){
      */
     'create': [
       policies.userSignup,
+      findUserAndLinkIfExists,
       createUser,
       sendWelcome,
       function(req,res){
-        res.json({ user: req.user });
+        var result = req.user;
+
+        if( req.header('namespaced') )
+          result = { users: JSON.parse(JSON.stringify(req.user)) };
+
+          if( req.header('sideload') )
+            result = util.transformJSON( result, req.header('namespaced') );
+
+        res.json(result);
       }],
 
     /**
@@ -227,10 +236,40 @@ module.exports = function UsersController( caminio, policies, middleware ){
   }
 
   /**
+   * @method findUserAndLinkIfExists
+   * @private
+   */
+
+  function findUserAndLinkIfExists( req, res, next ){
+    User.findOne({ email: req.body.user.email }, function( err, user ){
+      if( err ){
+        caminio.log.error( 'findUserAndLinkIfExists (user controller)', err );
+        return res.json( 500, { error: 'server_error', details: err });
+      }
+      if( !user )
+        return next();
+      if( user.camDomains.indexOf( res.locals.currentDomain._id ) >= 0 )
+        return res.json( 422, { errors: { email: 'already_member' }});
+      user.camDomains.push( res.locals.currentDomain );
+      user.save( function( err ){
+        if( err ){
+          caminio.log.error( 'findUserAndLinkIfExists (user controller)', err );
+          return res.json( 500, { error: 'server_error', details: err });
+        }
+        req.user = user;
+        next();
+      });
+    });
+  }
+
+  /**
    * @method createUser
    * @private
    */
   function createUser( req, res, next ){
+    if( req.user ) // already linked with existing user. nothing to do
+      return next();
+
     if( !('user' in req.body) )
       return res.json(400,{ error: 'missing_model_name_in_body', expected: 'expected "user"', got: req.body });
 
