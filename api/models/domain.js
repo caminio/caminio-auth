@@ -210,6 +210,8 @@ function DomainModel( caminio, mongoose ){
         buildAppDef.path = appDef.path || '/caminio/'+appDef.name;
         buildAppDef.admin = appDef.admin || false;
         buildAppDef.su = appDef.su || false;
+        buildAppDef.title = appDef.name;
+        buildAppDef.i18n = appDef.i18n || appDef.name;
         available[appDef.name] = buildAppDef;
       });
     });
