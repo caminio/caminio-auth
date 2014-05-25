@@ -56,6 +56,8 @@ function DomainModel( caminio, mongoose ){
       lockedAt: { type: Date },
       lockedBy: { type: ObjectId, ref: 'User' },
 
+      preferences: { type: Mixed, public: true },
+
       description: String,
       /**
        *  Holds statistic Data over the 31 days
