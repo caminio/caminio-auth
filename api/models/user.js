@@ -261,6 +261,14 @@ function UserModel( caminio, mongoose ){
     return false;
   });
 
+  schema.method('isTrusted', function(groupOrDomain){
+    if( this.isAdmin( groupOrDomain ) )
+      return true;
+    if( groupOrDomain instanceof caminio.models.Domain )
+      return this.roles[ groupOrDomain._id ] >= 80;
+    return false;
+  });
+
   //schema.virtual('admin').get(function(){
   //  if( this.isSuperUser() )
   //    return true;

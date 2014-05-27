@@ -210,8 +210,9 @@ function DomainModel( caminio, mongoose ){
         buildAppDef.icon = appDef.icon || 'fa-'+buildAppDef.name.toLowerCase();
         buildAppDef.color = appDef.color;
         buildAppDef.path = appDef.path || '/caminio/'+appDef.name;
-        buildAppDef.admin = appDef.admin || false;
-        buildAppDef.su = appDef.su || false;
+        buildAppDef.requireAdmin = appDef.requireAdmin || false;
+        buildAppDef.requireEditor = appDef.requireEditor || false;
+        buildAppDef.requireTrusted = appDef.requireTrusted || false;
         buildAppDef.title = appDef.name;
         buildAppDef.i18n = appDef.i18n || appDef.name;
         available[appDef.name] = buildAppDef;

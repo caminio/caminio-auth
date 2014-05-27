@@ -27,11 +27,11 @@ module.exports = function( caminio ){
         if( err ){ caminio.logger.error(err); return done(err); }
         if( !user ){ return done(null, false, { message: caminio.i18n.t('user_unknown') }); }
         if( !user.authenticate( password ) )
-          return done( null, false, { message: caminio.i18n.t('authentication_failed') });
-        if( caminio.env !== 'test' ){
-          if( user.lastRequestAt && user.lastRequestAt > (new Date()) - caminio.config.session.timeout )
-            return done( null, false, { message: caminio.i18n.t('currently_logged_in', {userId: user._id}) + '<span class="hide" data-user-id="'+user._id+'"></span>' });
-        }
+         return done( null, false, { message: caminio.i18n.t('authentication_failed') });
+        //if( caminio.env !== 'test' ){
+        //  if( user.lastRequestAt && user.lastRequestAt > (new Date()) - caminio.config.session.timeout )
+        //    return done( null, false, { message: caminio.i18n.t('currently_logged_in', {userId: user._id}) + '<span class="hide" data-user-id="'+user._id+'"></span>' });
+        //}
         user.update({ lastSessionAt: ( user.lastLoginAt ? user.lastLoginAt : null), 
                     lastSessionIp: (user.lastLoginIp || ''),
                     lastLoginAt: new Date(), lastRequestAt: new Date()}, function( err ){
