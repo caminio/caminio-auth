@@ -19,10 +19,10 @@ module.exports = function UsersController( caminio, policies, middleware ){
     'index': [
       getUsersByCamDomain,
       function( req, res ){
-        var result = req.users;
+        var result = req.userAccounts;
 
         if( req.header('namespaced') )
-          result = { users: JSON.parse(JSON.stringify(req.users)) };
+          result = { users: JSON.parse(JSON.stringify(req.userAccounts)) };
 
           if( req.header('sideload') )
             result = util.transformJSON( result, req.header('namespaced') );
@@ -40,10 +40,10 @@ module.exports = function UsersController( caminio, policies, middleware ){
       createUser,
       sendWelcome,
       function(req,res){
-        var result = req.user;
+        var result = req.userAccount;
 
         if( req.header('namespaced') )
-          result = { users: JSON.parse(JSON.stringify(req.user)) };
+          result = { users: JSON.parse(JSON.stringify(req.userAccount)) };
 
           if( req.header('sideload') )
             result = util.transformJSON( result, req.header('namespaced') );
@@ -79,7 +79,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
       updateUser,
       sendCredentials,
       function(req,res){
-        var result = req.user;
+        var result = req.userAccount;
         if( req.header('namespaced') )
           result = { users: JSON.parse(JSON.stringify(result)) };
 
@@ -95,7 +95,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
       checkOldAndUpdateUserPassword,
       sendCredentials,
       function(req,res){
-        res.json({ user: req.user });
+        res.json({ user: req.userAccount });
       }
     ],
 
@@ -107,7 +107,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
       getUserById,
       sendWelcome,
       function(req,res){
-        res.json({ user: req.user });
+        res.json({ user: req.userAccount });
       }],
 
     /**
@@ -151,7 +151,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
   function getUserById(req,res,next){
     User.findOne({ _id: req.params.id })
     .exec( function( err, user ){
-      if( user ){ req.user = user; }
+      if( user ){ req.userAccount = user; }
       next();
     });
   }
@@ -160,19 +160,19 @@ module.exports = function UsersController( caminio, policies, middleware ){
    * @method updateUserPassword
    */
   function updateUserPassword(req,res,next){
-    req.user.password = req.body.password;
-    req.user.confirmation.key = null;
-    req.user.save( function( err ){
+    req.userAccount.password = req.body.password;
+    req.userAccount.confirmation.key = null;
+    req.userAccount.save( function( err ){
       if( err ){ return next(err); }
-      req.user.populate('domains', function(err,user){
+      req.userAccount.populate('domains', function(err,user){
         user.camDomains.forEach( function(domain){
           caminio.audit.log( domain.name, 
-            'password has been changed for user',req.user.id,
-            ' (',req.user.fullName,') IP:',
+            'password has been changed for user',req.userAccount.id,
+            ' (',req.userAccount.fullName,') IP:',
             req.headers['x-forwarded-for'] || req.connection.remoteAddress );  
         });
         req.passwordChanged = true;
-        req.flash('info', req.i18n.t('user.password_reset_saved', { email: req.user.email }));
+        req.flash('info', req.i18n.t('user.password_reset_saved', { email: req.userAccount.email }));
         next();
       });
     });
@@ -183,17 +183,17 @@ module.exports = function UsersController( caminio, policies, middleware ){
    * @method checkOldAndUpdateUserPassword
    */
   function checkOldAndUpdateUserPassword(req,res,next){
-    if( !req.user.authenticate( req.body.oldPassword ) )
+    if( !req.userAccount.authenticate( req.body.oldPassword ) )
       return res.json(403,{ error: 'password_missmatch'});
-    req.user.password = req.body.newPassword;
-    req.user.confirmation.key = null;
-    req.user.save( function( err ){
+    req.userAccount.password = req.body.newPassword;
+    req.userAccount.confirmation.key = null;
+    req.userAccount.save( function( err ){
       if( err ){ return next(err); }
-      req.user.populate('domains', function(err,user){
+      req.userAccount.populate('domains', function(err,user){
         user.camDomains.forEach( function(domain){
           caminio.audit.log( domain.name, 
-            'password has been changed for user',req.user.id,
-            ' (',req.user.fullName,') IP:',
+            'password has been changed for user',req.userAccount.id,
+            ' (',req.userAccount.fullName,') IP:',
             req.headers['x-forwarded-for'] || req.connection.remoteAddress );  
         });
         req.passwordChanged = true;
@@ -207,15 +207,15 @@ module.exports = function UsersController( caminio, policies, middleware ){
    * @private
    */
   function checkValidRequest(req,res,next){
-    if( !req.user ){
+    if( !req.userAccount ){
       req.flash('error', req.i18n.t('auth.security_transgression'));
       return res.redirect('/caminio/login');
     }
-    if( !( req.user.confirmation && req.user.confirmation.key === req.params.key ) ){
+    if( !( req.userAccount.confirmation && req.userAccount.confirmation.key === req.params.key ) ){
       req.flash('error', req.i18n.t('auth.confirmation_missmatch'));
       return res.redirect('/caminio/login');
     }
-    if( !( req.user.confirmation && req.user.confirmation.expires < new Date() ) ){
+    if( !( req.userAccount.confirmation && req.userAccount.confirmation.expires < new Date() ) ){
       req.flash('error', req.i18n.t('auth.confirmation_expired') );
       return res.redirect('/caminio/login');
     }
@@ -227,7 +227,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
    * @private
    */
   function checkPassword( req,res,next ){
-    var passwordValidation = req.user.checkPassword( req.body.password, req.body.password_confirm );
+    var passwordValidation = req.userAccount.checkPassword( req.body.password, req.body.password_confirm );
     if( !passwordValidation[0] ){
       req.flash('error', req.i18n.t('user.errors.'+passwordValidation[1]));
       return res.redirect('/caminio/accounts/'+req.params.id+'/reset/'+req.params.key);
@@ -256,7 +256,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
           caminio.log.error( 'findUserAndLinkIfExists (user controller)', err );
           return res.json( 500, { error: 'server_error', details: err });
         }
-        req.user = user;
+        req.userAccount = user;
         next();
       });
     });
@@ -267,7 +267,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
    * @private
    */
   function createUser( req, res, next ){
-    if( req.user ) // already linked with existing user. nothing to do
+    if( req.userAccount ) // already linked with existing user. nothing to do
       return next();
 
     if( !('user' in req.body) )
@@ -289,7 +289,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
         return res.json( 500, { error: 'server_error', details: err }); 
       }
       if( !user ){ return res.json( 500, { error: 'unknown_error', details: 'did not get a user object after database action'}); }
-      req.user = user;
+      req.userAccount = user;
       next();
     });
   }
@@ -308,21 +308,21 @@ module.exports = function UsersController( caminio, policies, middleware ){
     if( req.body.user.password && req.body.user.password.length > 1 ){
       if( req.body.user.password !== req.body.user.passwordConfirmation )
         return res.json( 422, { error: 'passwords_missmatch' });
-      var check = req.user.checkPassword( req.body.user.password, req.body.user.passwordConfirmation );
+      var check = req.userAccount.checkPassword( req.body.user.password, req.body.user.passwordConfirmation );
       if( !check[0] )
         return res.json( 422, { error: check[1] });
-      req.user.password = req.body.user.password;
+      req.userAccount.password = req.body.user.password;
       req.passwordChanged = true;
     }
 
     for( var i in req.body.user ){
-      if( i in req.user.constructor.schema.paths )
-        req.user[i] = req.body.user[i];
+      if( i in req.userAccount.constructor.schema.paths )
+        req.userAccount[i] = req.body.user[i];
     }
 
-    req.user.generateConfirmationKey();
+    req.userAccount.generateConfirmationKey();
 
-    req.user.save( function( err ){
+    req.userAccount.save( function( err ){
       if( err ){ 
         if( err.name && err.name === 'ValidationError' )
           return res.json( 422, util.formatErrors(err) );
@@ -339,16 +339,16 @@ module.exports = function UsersController( caminio, policies, middleware ){
   function sendCredentials( req, res, next ){
     if( req.passwordChanged )
       caminio.mailer.send(
-        req.user.email,
+        req.userAccount.email,
         req.i18n.t('auth.mailer.subject_pwd_changed'), 
         'users/password_changed', 
         { 
           locals: {
             welcome: true,
-            user: req.user,
+            user: req.userAccount,
             domain: res.locals.currentDomain,
             creator: res.locals.currentUser,
-            url: ( caminio.config.hostname + '/caminio/accounts/' + req.user.id + '/reset/' + req.user.confirmation.key)
+            url: ( caminio.config.hostname + '/caminio/accounts/' + req.userAccount.id + '/reset/' + req.userAccount.confirmation.key)
           } 
         },
         function( err ){
@@ -365,16 +365,16 @@ module.exports = function UsersController( caminio, policies, middleware ){
    */
   function sendWelcome( req, res, next ){
     caminio.mailer.send(
-      req.user.email,
+      req.userAccount.email,
       req.i18n.t('auth.mailer.subject_welcome'), 
       'users/welcome', 
       { 
         locals: {
           welcome: true,
-          user: req.user,
+          user: req.userAccount,
           domain: res.locals.currentDomain,
           creator: res.locals.currentUser,
-          url: ( caminio.config.hostname + '/caminio/accounts/' + req.user.id + '/reset/' + req.user.confirmation.key)
+          url: ( caminio.config.hostname + '/caminio/accounts/' + req.userAccount.id + '/reset/' + req.userAccount.confirmation.key)
         } 
       },
       function( err ){
@@ -391,7 +391,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
         .sort({ 'lastname': 'asc' })
         .exec( function( err, users ){
           if( err ){ return res.json( 500, { error: 'server_error', details: err }); }
-          req.users = users;
+          req.userAccounts = users;
           next();
         });
   }
