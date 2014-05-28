@@ -159,6 +159,36 @@ describe('OpenAuth2 integration', function(){
 
   });
 
+  describe('/w_login_or_api_or_token', function(){
+
+    describe('with token', function(){
+
+      before( function( done ){
+        var self = this;
+        helper.agent()
+        .post( helper.url+'/oauth/request_token' )
+        .send({ client_id: test.client.id, client_secret: test.client.secret })
+        .end( function( err, res ){
+          self.token = JSON.parse(res.text);
+          done();
+        });
+      });
+
+      it('with token', function(done){
+        this.agent
+        .get( helper.url.replace('/caminio','')+'/w_login_or_api_or_token' )
+        .set( 'Authorization', 'Bearer '+this.token.token )
+        .end(function(err,res){
+          expect(res.status).to.eq(200);
+          expect(res.text).to.match(/caminio login api token dashboard/);
+          done();
+        });
+      });
+
+    });
+
+  });
+
   describe('token expires', function(){
 
     before( function( done ){

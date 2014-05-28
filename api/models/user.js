@@ -17,12 +17,13 @@ module.exports = UserModel;
  * @class User
  */
 function UserModel( caminio, mongoose ){
-  
+
+  'use strict';
+
   var crypto          = require('crypto');
   var ObjectId        = mongoose.Schema.Types.ObjectId;
   var Mixed           = mongoose.Schema.Types.Mixed;
   var caminioUtil     = require('caminio/util');
-  var _               = require('lodash');
 
   //var MessageSchema = require('./_schemas/message.schema.js')( caminio, mongoose );
 
@@ -36,6 +37,7 @@ function UserModel( caminio, mongoose ){
     lastname: String,
     encryptedPassword: String,
     salt: {type: String},
+    apiKey: { type: String, index: { unique: true } },
     remotePicUrl: { type: String, public: true },
     preferences: { type: Mixed, default: {} },
     mediafiles: { type: Array, public: true },

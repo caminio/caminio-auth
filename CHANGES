@@ -1,3 +1,18 @@
+0.0.7
+  - apiKey authentication (sticky with user) 
+
+0.0.6
+  - bug fixes
+
+0.0.5
+  - adaptations to new design
+
+0.0.4
+  - minor improvements
+
+0.0.3
+  - oauth
+
 0.0.2
   - removed restriction for domain names to be valid fqdn and
   - added fqdn field which is either passed in by the user or auto-generated on creation (from name)

@@ -54,10 +54,8 @@ module.exports = function( caminio ){
    *
    */
   function addCurrentUser( req, res, next ){
-    
-    if( !req.user )
-      return next();
-    res.locals.currentUser = req.user;
+
+    res.locals.currentUser = res.locals.currentUser || req.user;
 
     next();
 

@@ -10,6 +10,8 @@
 
 module.exports = function DashboardController( caminio, policies, middleware ){
 
+  'use strict';
+
   return {
 
     'index':[
@@ -24,13 +26,25 @@ module.exports = function DashboardController( caminio, policies, middleware ){
         res.send('caminio token dashboard');
       }],
 
+    'index_w_apikey':[
+      policies.ensureApiKey,
+      function( req, res ){
+        res.send('caminio api dashboard');
+      }],
+
     'index_w_login_or_token':[
       policies.ensureLoginOrToken,
       function( req, res ){
         res.send('caminio login token dashboard');
+      }],
+
+    'index_w_login_or_api_or_token':[
+      policies.ensureLoginOrApiOrToken,
+      function( req, res ){
+        res.send('caminio login api token dashboard');
       }]
 
 
-  }
+  };
 
-}
+};
