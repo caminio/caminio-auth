@@ -140,6 +140,28 @@ module.exports = function UsersController( caminio, policies, middleware ){
             res.send(200, 'done');
           });
         });
+      }],
+
+    'genApiKey': [
+      getUserById,
+      function( req, res ){
+        var apiKey = util.uid(48);
+        User.count({ apiKey: apiKey })
+          .exec(function( err, count ){
+            if( err ){ 
+              caminio.logger.error( err ); 
+              return res.send(500); 
+            }
+            if( count > 0 ) 
+              return res.send(409);
+            req.user.update({ apiKey: apiKey }, function( err ){
+              if( err ){ 
+                caminio.logger.error( err ); 
+                return res.send(500); 
+              }
+              return res.json( req.user );
+            });
+          });
       }]
 
   };
@@ -183,7 +205,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
    * @method checkOldAndUpdateUserPassword
    */
   function checkOldAndUpdateUserPassword(req,res,next){
-    if( !req.userAccount.authenticate( req.body.oldPassword ) )
+    if( !res.locals.currentUser.isAdmin( res.locals.currentDomain ) && !req.userAccount.authenticate( req.body.oldPassword ) )
       return res.json(403,{ error: 'password_missmatch'});
     req.userAccount.password = req.body.newPassword;
     req.userAccount.confirmation.key = null;
@@ -299,7 +321,8 @@ module.exports = function UsersController( caminio, policies, middleware ){
    * @private
    */
   function updateUser( req, res, next ){
-    if( req.param('id') !== res.locals.currentUser.id && !res.locals.currentUser.isAdmin() )
+
+    if( req.param('id') !== res.locals.currentUser.id && !res.locals.currentUser.isAdmin( res.locals.currentDomain ) )
       return res.json(403, { error: 'security_transgression' });
 
     if( !('user' in req.body) )

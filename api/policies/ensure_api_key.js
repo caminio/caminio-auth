@@ -21,12 +21,14 @@ module.exports = function( caminio ){
       return res.send(400);
 
     apiKey = apiKey.replace('API-KEY ','').replace(/\ /g,'');
-    User.findOne({ apiKey: apiKey }, function( err, user ){
-      if( err ){ return res.json(500, { error: 'server_error', message: err }); }
-      if( !user ){ return res.json(403, { error: 'invalid_api_key' }); }
-      req.user = user;
-      next();
-    });
+    User.findOne({ apiKey: apiKey })
+      .populate('camDomains')
+      .exec( function( err, user ){
+        if( err ){ return res.json(500, { error: 'server_error', message: err }); }
+        if( !user ){ return res.json(403, { error: 'invalid_api_key' }); }
+        req.user = user;
+        next();
+      });
 
   };
 
