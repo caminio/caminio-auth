@@ -9,10 +9,15 @@ module.exports = function UsersController( caminio, policies, middleware ){
 
   return {
 
-    _before: {
-      '*!(reset,do_reset)': policies.ensureLogin
+    _policies: {
+      '*!(mine,reset,do_reset)': policies.ensureLogin,
+      'mine': policies.ensureLoginOrApiOrToken
     },
 
+    'mine': function( req, res ){
+      res.json( req.user );
+    },
+  
     /**
      * return all users matching the currentDomain
      */
