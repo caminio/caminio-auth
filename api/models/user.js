@@ -37,7 +37,7 @@ function UserModel( caminio, mongoose ){
     lastname: String,
     encryptedPassword: String,
     salt: {type: String},
-    apiKey: { type: String, index: { unique: true }, public: true },
+    apiKey: { type: String, index: { unique: true, sparse: true }, public: true },
     remotePicUrl: { type: String, public: true },
     preferences: { type: Mixed, default: {} },
     mediafiles: { type: Array, public: true },

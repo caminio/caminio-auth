@@ -10,8 +10,8 @@ module.exports = function UsersController( caminio, policies, middleware ){
   return {
 
     _policies: {
+      'mine': policies.ensureLoginOrApiOrToken,
       '*!(mine,reset,do_reset)': policies.ensureLogin,
-      'mine': policies.ensureLoginOrApiOrToken
     },
 
     'mine': function( req, res ){
@@ -191,7 +191,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
     req.userAccount.confirmation.key = null;
     req.userAccount.save( function( err ){
       if( err ){ return next(err); }
-      req.userAccount.populate('domains', function(err,user){
+      req.userAccount.populate('camDomains', function(err,user){
         user.camDomains.forEach( function(domain){
           caminio.audit.log( domain.name, 
             'password has been changed for user',req.userAccount.id,
@@ -216,7 +216,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
     req.userAccount.confirmation.key = null;
     req.userAccount.save( function( err ){
       if( err ){ return next(err); }
-      req.userAccount.populate('domains', function(err,user){
+      req.userAccount.populate('camDomains', function(err,user){
         user.camDomains.forEach( function(domain){
           caminio.audit.log( domain.name, 
             'password has been changed for user',req.userAccount.id,
