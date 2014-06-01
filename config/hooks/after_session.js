@@ -8,14 +8,16 @@
  *
  */
 
-var passport = require('passport');
+module.exports = function afterSession( caminio ){
 
-module.exports = function( caminio ){
+  'use strict';
 
-  caminio.hooks.define( 'after', 'session', 'setupPassport', afterSession );
+  var passport = require('passport');
 
-  function afterSession( cb ){
-  
+  return setupPassport;
+
+  function setupPassport( cb ){
+
     caminio.express.use( passport.initialize() );
     caminio.express.use( passport.session() );
 

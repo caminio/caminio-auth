@@ -8,11 +8,14 @@
  *
  */
 
-var express = require('express');
 
 module.exports = function( caminio ){
 
-  caminio.hooks.define( 'before', 'router', 'setupCSRF', setupCSRF );
+  'use strict';
+
+  var express = require('express');
+
+  return setupCSRF;
 
   function setupCSRF(){
 

@@ -8,9 +8,9 @@
  *
  */
 
-var _             = require('lodash');
-
 module.exports = function( caminio ){
+
+  'use strict';
 
   return function processFlash( req, res, next ){
     res.locals.message = {

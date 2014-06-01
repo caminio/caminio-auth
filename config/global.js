@@ -1,14 +1,18 @@
-var _     = require('lodash');
-
 // global middleware actions to be run
 // in every request
 module.exports = function( caminio ){
 
-  var Domain = caminio.models.Domain;
+  'use strict';
+
+  var _       = require('lodash');
+  var fs      = require('fs');
+  var Domain  = caminio.models.Domain;
 
   return [ 
     addCurrentDomain,
+    addDomainSettings,
     addCurrentUser,
+    // caminifyModels,
     addAllowedApps
   ];
 
@@ -62,6 +66,21 @@ module.exports = function( caminio ){
   }
 
   /**
+   * add <domain.getContentPath()>/.settings.j
+   */
+  function addDomainSettings( req, res, next ){
+  
+    if( !res.locals.currentDomain )
+      return next();
+
+    if( fs.existsSync( res.locals.currentDomain.getContentPath()+'/.settings.js' ) )
+      res.locals.domainSettings = require( res.locals.currentDomain.getContentPath()+'/.settings.js');
+
+    next();
+
+  }
+
+  /**
    * adds allowedApps collected from currentDomain
    * object
    *
@@ -74,5 +93,26 @@ module.exports = function( caminio ){
     res.locals.allowedApps = res.locals.currentDomain.allowedApps();
     next();
   }
+
+  //function caminifyModels( req, res, next ){
+
+  //  _.each( caminio.models, function( Model ){
+  //    if( !Model.schema.caminify )
+  //      return;
+  //    caminio.logger.debug('caminified', Model.modelName);
+
+  //    Model.schema.virtual('currentDomain').get( getCurrentDomain );
+  //    console.log(Object.keys(Model), Object.keys(Model.model));
+  //    Model.schema.methods.currentUser = getCurrentDomain;
+  //  });
+
+  //  next();
+
+  //  function getCurrentDomain(){
+  //    return 'ME';
+  //    //return res.locals.currentDomain;
+  //  }
+
+  //}
 
 };
