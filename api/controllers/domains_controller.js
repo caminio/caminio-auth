@@ -151,6 +151,7 @@ module.exports = function DomainsController( caminio, policies, middleware ){
       firstname: req.body.domain.user.firstname,
       lastname: req.body.domain.user.lastname,
       lang: req.body.domain.lang || 'en',
+      apiKey: null,
       email: req.body.domain.user.email,
       password: req.body.domain.user.password || (new Date()).getTime().toString()}, function( err, user ){
         if( err && err.name && err.name === 'ValidationError' )
