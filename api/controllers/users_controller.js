@@ -11,7 +11,11 @@ module.exports = function UsersController( caminio, policies, middleware ){
 
     _policies: {
       'mine': policies.ensureLoginOrApiOrToken,
-      '*!(mine,reset,do_reset)': policies.ensureLogin,
+      '*!(mine,reset,do_reset)': policies.ensureLogin
+    },
+
+    _before: {
+      'create,index': policies.ensureAdmin
     },
 
     'mine': function( req, res ){

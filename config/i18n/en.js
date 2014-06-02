@@ -11,10 +11,10 @@ module.exports = function( t ){
   t.auth.email_address = 'Email address';
   t.auth.password = 'Your password';
   t.auth.confirm_password = 'Re-enter password';
-  t.auth.enter_new_password = 'Enter your new password';
-  t.auth.confirmation_missmatch = 'Confirmation key missmatch';
+  t.auth.enter_new_password = '<h1>Enter new password</h1>Please note, the password should consist of:<br><ul><li>at least 1 capital</li><li>at least 1 lower-case letter</li><li>at least 1 number</li><li>at least 6 characters long</li></ul>';
+  t.auth.confirmation_missmatch = '<h1>Oh No!</h1>Confirmation key missmatch';
   t.back_to_login = 'Back to login';
-  t.auth.unknown_email = 'The email address __email__ is not known to this system.';
+  t.auth.unknown_email = '<h1>Oh No!</h1>The email address __email__ is not known to this system.';
   t.auth.mailer = t.auth.mailer || {};
   t.auth.mailer.subject_reset_password = 'Reset password request';
   t.auth.mailer.subject_pwd_changed = 'Your password has been changed';
@@ -24,8 +24,21 @@ module.exports = function( t ){
 
   t.user = t.user || {};
   t.user.errors = t.user.errors || {};
-  t.user.errors.too_short = 'The chosen password is too short. Please use 6 characters at least. Please ensure, you have at least one uppercase, one lowercase character and one digit';
+  t.user.errors.too_short = '<h1>Oh No!</h1>The password chosen does not meet our requirements. Please note, the password should consist of:<br><ul><li>at least 1 capital</li><li>at least 1 lower-case letter</li><li>at least 1 number</li><li>at least 6 characters long</li></ul>';
   t.user.errors.requirements_not_met = 'The chosen password does not meet all requirements. Please use at least one uppercase, one lowercase character and one digit, in total at least 6 characters';
+
+  t.email = 'Email';
+  t.name = 'Name';
+
+  // USERS
+  t.user = t.user || {};
+  t.user.passwords_missmatch = 'Passwords missmatch';
+  t.user.password_too_short = 'too short (6 characters at least)';
+  t.user.password_saved = 'New password has been saved';
+  t.user.password_reset_saved = 'New password has been saved. You can now log in with your email address __email__ and the password chosen just now';
+
+  t.user.password_saved = '<h1>Log in now!</h1>The new password has been saved';
+  t.user.password_reset_saved = '<h1>Log in now!</h1>The new password has been saved.<br> You can now log in with your email address __email__ and the password just chosen.';
 
   t.setup = t.setup || {};
   t.setup.title = 'Initial setup';

@@ -24,6 +24,7 @@ function UserModel( caminio, mongoose ){
   var ObjectId        = mongoose.Schema.Types.ObjectId;
   var Mixed           = mongoose.Schema.Types.Mixed;
   var caminioUtil     = require('caminio/util');
+  var _               = require('lodash');
 
   //var MessageSchema = require('./_schemas/message.schema.js')( caminio, mongoose );
 
@@ -35,6 +36,7 @@ function UserModel( caminio, mongoose ){
   var schema = new mongoose.Schema({
     firstname: String,
     lastname: String,
+    nickname: String,
     encryptedPassword: String,
     salt: {type: String},
     apiKey: { type: String, index: { unique: true, sparse: true }, public: true },
@@ -250,7 +252,7 @@ function UserModel( caminio, mongoose ){
     if( groupOrDomain instanceof caminio.models.Domain ){
       if( groupOrDomain.owner.equals( this._id.toString() ) )
         return true;
-      if( groupOrDomain._id in this.camDomains )
+      if( _.find( this.camDomains, {_id: groupOrDomain._id }) )
         return this.roles[ groupOrDomain._id ] === 100;
     }
     return false;
@@ -375,6 +377,7 @@ function UserModel( caminio, mongoose ){
   schema.publicAttributes = [
     'firstname',
     'lastname',
+    'nickname',
     'fullname',
     'lang',
     'camDomains',

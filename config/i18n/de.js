@@ -17,9 +17,15 @@ module.exports = function( t ){
 
   t.user = t.user || {};
   t.user.errors = t.user.errors || {};
-  t.user.errors.too_short = 'Das ausgewählte Passwort ist zu kurz. Das Passwort muss aus mind. 6 Zeichen bestehen, davon mind. 1 Großbuchstabe, 1 Kleinbuchstage und eine Ziffer';
+  t.user.errors.too_short = '<h1>Oje!</h1>Das ausgewählte Passwort ist zu kurz. Beachte bitte folgende Kriterien:<br><ul><li>mind. 1 Großbuchstabe</li><li>mind. 1 Kleinbuchstabe</li><li>mind. 1 Ziffer</li><li>mind. 6 Zeichen lang</li></ul>';
+  t.user.errors.confirmation_missmatch = '<h1>Oje!</h1>Die angegebenen Passwörter stimmen nicht überein.<br> Bitte überprüfe deine Eingabe.';
   t.user.errors.requirements_not_met = 'Das ausgewählte Passwort erfüllt nicht alle Kriterien. Es muss aus mind. 6 Zeichen bestehen, davon mind. 1 Großbuchstabe, 1 Kleinbuchstage und eine Ziffer';
 
+  t.email = 'Email';
+  t.name = 'Name';
+
+  t.user.password_saved = '<h1>Jetzt nochmal anmelden!</h1>Das neue Passwort wurde gespeichert';
+  t.user.password_reset_saved = '<h1>Jetzt nochmal anmelden!</h1>Das neue Passwort wurde gespeichert.<br> Du kannst dich jetzt mit deiner Email Adresse __email__ und dem eben gewählten Passwort anmelden.';
   t.username_email = 'Kontoname';
   t.password = 'Passwort';
   t.login = 'Anmelden';
@@ -35,8 +41,8 @@ module.exports = function( t ){
 
   t.auth.password = 'Passwort';
   t.auth.confirm_password = 'Passwort wiederholen';
-  t.auth.enter_new_password = 'Neues Passwort eingeben';
-  t.auth.confirmation_missmatch = 'Schlüsselüberprüfung fehlgeschlagen';
+    t.auth.enter_new_password = '<h1>Hallo!</h1>Du kannst jetzt ein neues Passwort eingeben. Beachte bitte folgende Kriterien:<br><ul><li>mind. 1 Großbuchstabe</li><li>mind. 1 Kleinbuchstabe</li><li>mind. 1 Ziffer</li><li>mind. 6 Zeichen lang</li></ul>';
+  t.auth.confirmation_missmatch = '<h1>Oje!</h1>Schlüsselüberprüfung fehlgeschlagen. Dieser Schlüssel existiert nicht oder er wurde bereits verwendet.';
   t.back_to_login = 'Zurück zum Login';
   t.auth.unknown_email = 'Die Email Adresse __email__ ist uns nicht bekannt';
   t.auth.mailer = t.auth.mailer || {};
