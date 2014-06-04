@@ -309,6 +309,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
 
     if( res.locals.currentDomain.lang )
       req.body.user.lang = res.locals.currentDomain.lang;
+    req.body.user.apiKey = util.uid(48);
 
     req.body.user.camDomains = res.locals.currentDomain;
 
