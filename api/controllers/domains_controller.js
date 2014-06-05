@@ -13,7 +13,7 @@ module.exports = function DomainsController( caminio, policies, middleware ){
 
   return {
 
-    _before: {
+    _policies: {
       '*': policies.ensureLogin
     },
 
@@ -151,7 +151,7 @@ module.exports = function DomainsController( caminio, policies, middleware ){
       firstname: req.body.domain.user.firstname,
       lastname: req.body.domain.user.lastname,
       lang: req.body.domain.lang || 'en',
-      apiKey: null,
+      apiKey: util.uid(48),
       email: req.body.domain.user.email,
       password: req.body.domain.user.password || (new Date()).getTime().toString()}, function( err, user ){
         if( err && err.name && err.name === 'ValidationError' )
@@ -273,11 +273,11 @@ module.exports = function DomainsController( caminio, policies, middleware ){
    */
   function createDomainDirectory( req, res, next ){
     if( !fs.existsSync( req.domain.getContentPath() ) )
-      mkdirp.sync( req.domain.getContentPath() )
-    if( fs.existsSync( join( req.domain.getContentPath(), '.settings.js' ) ) )
+      mkdirp.sync( join( req.domain.getContentPath(), 'config') );
+    if( fs.existsSync( join( req.domain.getContentPath(), 'config/site.js' ) ) )
       return next();
-    var tmplFileData = fs.readFileSync( join( __dirname, '..', '..', 'lib', 'templates', 'settings.js'), 'utf8' );
-    fs.writeFileSync( join( req.domain.getContentPath(), '.settings.js' ), tmplFileData );
+    var tmplFileData = fs.readFileSync( join( __dirname, '..', '..', 'lib', 'templates', 'site.js'), 'utf8' );
+    fs.writeFileSync( join( req.domain.getContentPath(), 'config/site.js' ), tmplFileData );
     next();  
   }
 

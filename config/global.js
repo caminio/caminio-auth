@@ -66,15 +66,15 @@ module.exports = function( caminio ){
   }
 
   /**
-   * add <domain.getContentPath()>/.settings.j
+   * add <domain.getContentPath()>/config/site.js
    */
   function addDomainSettings( req, res, next ){
   
     if( !res.locals.currentDomain )
       return next();
 
-    if( fs.existsSync( res.locals.currentDomain.getContentPath()+'/.settings.js' ) )
-      res.locals.domainSettings = require( res.locals.currentDomain.getContentPath()+'/.settings.js');
+    if( fs.existsSync( res.locals.currentDomain.getContentPath()+'/config/site.js' ) )
+      res.locals.domainSettings = require( res.locals.currentDomain.getContentPath()+'/config/site.js');
 
     next();
 
