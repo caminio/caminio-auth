@@ -93,7 +93,12 @@ function UserModel( caminio, mongoose ){
     phone: {
       type: String,
       match: /^[\d]*$/
-    }
+    },
+    /**
+     *  @property notify
+     *  @type { Object }
+     */
+    notify: { type: Mixed }
   });
 
   /**

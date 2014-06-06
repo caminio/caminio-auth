@@ -1,6 +1,6 @@
 0.0.7
   - apiKey authentication (sticky with user) 
-
+  - added notify to user model
 0.0.6
   - bug fixes
 
