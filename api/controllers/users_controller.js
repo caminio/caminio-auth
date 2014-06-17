@@ -6,6 +6,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
   var async         = require('async');
   var User          = caminio.models.User;
   var util          = require('caminio/util');
+  var _             = require('lodash');
 
   return {
 
@@ -15,7 +16,8 @@ module.exports = function UsersController( caminio, policies, middleware ){
     },
 
     _before: {
-      'create,index': policies.ensureAdmin
+      'create,index': policies.ensureAdmin,
+      'update': [ensureSelfOrAdmin, getUserById, clearDangerousFields]
     },
 
     'mine': function( req, res ){
@@ -427,6 +429,31 @@ module.exports = function UsersController( caminio, policies, middleware ){
           req.userAccounts = users;
           next();
         });
+  }
+
+  function ensureSelfOrAdmin( req, res, next ){
+    if( !res.locals.currentUser.isAdmin() && res.locals.currentUser._id.toString() !== req.param('id') )
+      return res.json( 500, { error: 'access denied' });
+    next();
+  }
+
+  /**
+   * clears fields that would grant users access to other domains
+   * or increase their access level
+   *
+   * @method clearDangerousFields
+   * @private
+   */
+  function clearDangerousFields( req, res, next ){
+    delete req.body.user.camDomains;
+    if( !res.locals.currentUser.isAdmin() ){
+      delete req.body.user.roles;
+      return next();
+    }
+    myDomainRole = req.body.user.roles[ res.locals.currentDomain._id.toString() ];
+    req.body.user.roles = _.merge({}, req.userAccount.roles );
+    req.body.user.roles[res.locals.currentDomain._id.toString()] = myDomainRole;
+    next();
   }
 
 };
