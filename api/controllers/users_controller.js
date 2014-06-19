@@ -432,7 +432,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
   }
 
   function ensureSelfOrAdmin( req, res, next ){
-    if( !res.locals.currentUser.isAdmin() && res.locals.currentUser._id.toString() !== req.param('id') )
+    if( !res.locals.currentUser.isAdmin( res.locals.currentDomain ) && res.locals.currentUser._id.toString() !== req.param('id') )
       return res.json( 500, { error: 'access denied' });
     next();
   }
