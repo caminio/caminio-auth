@@ -5,6 +5,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
 
   var async         = require('async');
   var User          = caminio.models.User;
+  var Domain        = caminio.models.Domain;
   var util          = require('caminio/util');
   var _             = require('lodash');
 
@@ -17,7 +18,8 @@ module.exports = function UsersController( caminio, policies, middleware ){
 
     _before: {
       'create,index': policies.ensureAdmin,
-      'update': [ensureSelfOrAdmin, getUserById, clearDangerousFields]
+      'update': [ensureSelfOrAdmin, getUserById, clearDangerousFields],
+      'destroy': [ getUserById, checkOwnerOfOtherDomain ]
     },
 
     'mine': function( req, res ){
@@ -284,6 +286,8 @@ module.exports = function UsersController( caminio, policies, middleware ){
       if( user.camDomains.indexOf( res.locals.currentDomain._id ) >= 0 )
         return res.json( 422, { errors: { email: 'already_member' }});
       user.camDomains.push( res.locals.currentDomain );
+      user.roles = user.roles || {};
+      user.roles[ res.locals.currentDomain._id.toString() ] = req.body.user.roles[ res.locals.currentDomain._id.toString() ];
       user.save( function( err ){
         if( err ){
           caminio.log.error( 'findUserAndLinkIfExists (user controller)', err );
@@ -454,6 +458,31 @@ module.exports = function UsersController( caminio, policies, middleware ){
     req.body.user.roles = _.merge({}, req.userAccount.roles );
     req.body.user.roles[res.locals.currentDomain._id.toString()] = myDomainRole;
     next();
+  }
+
+  /**
+   * checks if this user is owner of another domain
+   * @method checkOwnerOfOtherDomain
+   * @private
+   */
+  function checkOwnerOfOtherDomain( req, res, next ){
+    Domain
+      .count({ _id: { $ne: res.locals.currentDomain._id }})
+      .exec(function(err,count){
+        if( count < 1 )
+          return next();
+        req.userAccount.camDomains.pull( res.locals.currentDomain._id );
+        delete req.userAccount.roles[ res.locals.currentDomain._id.toString() ];
+        req.userAccount.markModified('roles');
+        req.userAccount.save(function(err){
+          if( err ){ 
+            caminio.logger.error( 'remove_from_domain', err );
+            return res.json(500, { error: 'internal error', details: err }); 
+          }
+          res.json({ user: req.userAccount });
+        });
+        return res.json(200);
+      });
   }
 
 };
