@@ -31,6 +31,7 @@ module.exports.routes = {
 
   '/caminio/logout': 'Auth::V1::AuthController#logout',
 
-  'POST /caminio/oauth/request_token': 'Auth::V1::OAuthController#request_token'
+  'POST /caminio/oauth/request_token': 'Auth::V1::OAuthController#request_token',
+  'POST /caminio/oauth/api_token': 'Auth::V1::ApiController#request_token'
 
 };
