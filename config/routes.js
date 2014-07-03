@@ -18,7 +18,7 @@ module.exports.routes = {
   'GET /caminio/accounts/:id/reset/:key': 'UsersController#reset',
   'POST /caminio/accounts/:id/reset/:key': 'UsersController#do_reset',
   'POST /caminio/accounts/:id/resend_credentials': 'UsersController#resend_credentials',
-  'POST /caminio/accounts/:id/gen_api_key': 'UsersController#genApiKey',
+  'POST /caminio/accounts/:id/gen_api_private_key': 'UsersController#genApiPrivateKey',
 
   'GET /caminio/domains/:id/preview/:file*': 'DomainsController#preview',
   'GET /caminio/domains/:id/javascripts/:name/:folder/:file': 'DomainsController#scripts',
@@ -32,6 +32,6 @@ module.exports.routes = {
   '/caminio/logout': 'Auth::V1::AuthController#logout',
 
   'POST /caminio/oauth/request_token': 'Auth::V1::OAuthController#request_token',
-  'POST /caminio/oauth/api_token': 'Auth::V1::ApiController#request_token'
+  // 'POST /caminio/oauth/api_token': 'Auth::V1::ApiController#request_token'
 
 };

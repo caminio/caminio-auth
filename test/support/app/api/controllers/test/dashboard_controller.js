@@ -27,7 +27,7 @@ module.exports = function DashboardController( caminio, policies, middleware ){
       }],
 
     'index_w_apikey':[
-      policies.ensureApiKey,
+      policies.ensureApiPublicKey,
       function( req, res ){
         res.send('caminio api dashboard');
       }],
@@ -39,7 +39,7 @@ module.exports = function DashboardController( caminio, policies, middleware ){
       }],
 
     'index_w_login_or_api_or_token':[
-      policies.ensureLoginOrApiOrToken,
+      policies.ensureLoginOrApiPublicOrToken,
       function( req, res ){
         res.send('caminio login api token dashboard');
       }]
