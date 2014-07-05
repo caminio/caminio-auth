@@ -25,10 +25,11 @@ module.exports = function( caminio ){
    *
    */
   function addCurrentDomain( req, res, next ){
+
     if( !req.user )
       return next();
 
-    if( req.param('camDomainId') )
+    if( req.param('camDomainId') && ( _.contains( req.user.camDomains, req.param('camDomainId') ) || req.user.superuser ) )
       req.session.camDomainId = req.param('camDomainId');
 
     // if no session or no explicit request, set

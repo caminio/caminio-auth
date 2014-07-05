@@ -24,10 +24,10 @@ module.exports = function( caminio ){
     User.findOne({ apiPublicKey: apiKey })
       .populate('camDomains')
       .exec( function( err, user ){
-        console.log('\n\n\n', req.header('authorization'), apiKey, err, user);
         if( err ){ return res.json(500, { error: 'server_error', message: err }); }
         if( !user ){ return res.json(403, { error: 'invalid_api_key' }); }
         req.user = user;
+        req.apiPublicLogin = true;
         next();
       });
 
