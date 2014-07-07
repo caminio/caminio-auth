@@ -43,7 +43,7 @@ describe('APIKey authentication integration', function(){
     it('invalid request (Authorization header wrong)', function(done){
       helper.agent()
       .get( helper.url.replace('/caminio','')+'/w_apikey' )
-      .set( 'Authorization', 'API-KE ' +this.user.apiKey)
+      .set( 'Authorization', 'API ' +this.user.apiPublicKey)
       .end( function( err, res ){
         expect(res.status).to.eq(403);
         done();
@@ -53,7 +53,7 @@ describe('APIKey authentication integration', function(){
     it('invalid API key', function(done){
       helper.agent()
       .get( helper.url.replace('/caminio','')+'/w_apikey' )
-      .set( 'Authorization', 'API-KEY 2902986029386236' )
+      .set( 'Authorization', 'API-PUBLIC-KEY 2902986029386236' )
       .end( function( err, res ){
         expect(res.status).to.eq(403);
         done();
@@ -63,7 +63,7 @@ describe('APIKey authentication integration', function(){
     it('valid API key', function(done){
       helper.agent()
       .get( helper.url.replace('/caminio','')+'/w_apikey' )
-      .set( 'Authorization', 'API-KEY '+this.user.apiKey )
+      .set( 'Authorization', 'API-PUBLIC-KEY '+this.user.apiPublicKey )
       .end( function( err, res ){
         expect(res.status).to.eq(200);
         expect(res.text).to.eql('caminio api dashboard');
@@ -78,7 +78,7 @@ describe('APIKey authentication integration', function(){
     it('valid API key', function(done){
       helper.agent()
       .get( helper.url.replace('/caminio','')+'/w_login_or_api_or_token' )
-      .set( 'Authorization', 'API-KEY '+this.user.apiKey )
+      .set( 'Authorization', 'API-PUBLIC-KEY '+this.user.apiPublicKey )
       .end( function( err, res ){
         expect(res.status).to.eq(200);
         expect(res.text).to.eql('caminio login api token dashboard');
@@ -92,7 +92,6 @@ describe('APIKey authentication integration', function(){
 
 function createUserAndClient( cb ){
   var attrs = fixtures.User.attributes();
-  attrs.apiKey = caminioUtil.uid(48);
   caminio.models.User.create( attrs, function( err, user ){
     test.user = user;
     cb();

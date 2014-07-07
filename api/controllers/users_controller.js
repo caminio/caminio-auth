@@ -3,6 +3,8 @@
  */
 module.exports = function UsersController( caminio, policies, middleware ){
 
+  'use strict';
+
   var async         = require('async');
   var User          = caminio.models.User;
   var Domain        = caminio.models.Domain;
@@ -12,11 +14,12 @@ module.exports = function UsersController( caminio, policies, middleware ){
   return {
 
     _policies: {
-      'mine': policies.ensureLoginOrApiOrToken,
+      'mine': policies.ensureLoginOrApiPublicOrToken,
       '*!(mine,reset,do_reset)': policies.ensureLogin
     },
 
     _before: {
+      'mine': policies.enableCrossOrigin,
       'create,index': policies.ensureAdmin,
       'update': [ensureSelfOrAdmin, getUserById, clearDangerousFields],
       'destroy': [ getUserById, checkOwnerOfOtherDomain ]
@@ -150,16 +153,18 @@ module.exports = function UsersController( caminio, policies, middleware ){
               encryptedPassword: user.encrypted_password
             }, next );
           }, function( err ){
+            if( err ){ caminio.logger.error('error in migrate', err); }
             res.send(200, 'done');
           });
         });
       }],
 
-    'genApiKey': [
+    'genApiPrivateKey': [
       getUserById,
       function( req, res ){
-        var apiKey = util.uid(48);
-        User.count({ apiKey: apiKey })
+        var apiPrivateKey = util.uid(48);
+        var apiPublicKey = req.userAccount.apiPublicKey || util.uid(48);
+        User.count({ apiPrivateKey: apiPrivateKey, apiPublicKey: apiPublicKey, _id: { $ne: req.user._id } })
           .exec(function( err, count ){
             if( err ){ 
               caminio.logger.error( err ); 
@@ -167,12 +172,15 @@ module.exports = function UsersController( caminio, policies, middleware ){
             }
             if( count > 0 ) 
               return res.send(409);
-            req.user.update({ apiKey: apiKey }, function( err ){
+            req.userAccount.apiPrivateKey = apiPrivateKey;
+            req.userAccount.apiPublicKey = apiPublicKey;
+            req.userAccount.apiEnabled = true;
+            req.userAccount.save( function( err ){
               if( err ){ 
                 caminio.logger.error( err ); 
                 return res.send(500); 
               }
-              return res.json( req.user );
+              return res.json( req.userAccount );
             });
           });
       }]
@@ -315,7 +323,6 @@ module.exports = function UsersController( caminio, policies, middleware ){
 
     if( res.locals.currentDomain.lang )
       req.body.user.lang = res.locals.currentDomain.lang;
-    req.body.user.apiKey = util.uid(48);
 
     req.body.user.camDomains = res.locals.currentDomain;
 
@@ -454,7 +461,7 @@ module.exports = function UsersController( caminio, policies, middleware ){
       delete req.body.user.roles;
       return next();
     }
-    myDomainRole = req.body.user.roles[ res.locals.currentDomain._id.toString() ];
+    var myDomainRole = req.body.user.roles[ res.locals.currentDomain._id.toString() ];
     req.body.user.roles = _.merge({}, req.userAccount.roles );
     req.body.user.roles[res.locals.currentDomain._id.toString()] = myDomainRole;
     next();

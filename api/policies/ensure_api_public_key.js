@@ -14,19 +14,20 @@ module.exports = function( caminio ){
 
   var User     = caminio.models.User;
 
-  return function ensureAPIKey(req, res, next) {
+  return function ensureAPIPublicKey(req, res, next) {
 
     var apiKey = req.header('Authorization');
     if( !apiKey )
       return res.send(400);
 
-    apiKey = apiKey.replace('API-KEY ','').replace(/\ /g,'');
-    User.findOne({ apiKey: apiKey })
+    apiKey = apiKey.replace('API-PUBLIC-KEY ','').replace(/\ /g,'');
+    User.findOne({ apiPublicKey: apiKey })
       .populate('camDomains')
       .exec( function( err, user ){
         if( err ){ return res.json(500, { error: 'server_error', message: err }); }
         if( !user ){ return res.json(403, { error: 'invalid_api_key' }); }
         req.user = user;
+        req.apiPublicLogin = true;
         next();
       });
 
