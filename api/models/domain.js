@@ -47,7 +47,7 @@ function DomainModel( caminio, mongoose ){
       groups: [ { type: ObjectId, ref: 'Group' } ],
       owner: { type: ObjectId, ref: 'User' },
       selectedApps: { type: mongoose.Schema.Types.Mixed, default: {} },
-      allowedAppNames: { type: Array, default: ['admin'] },
+      allowedAppNames: { type: Array, default: ['admin', 'rocksol'] },
       createdAt:{ type: Date, default: Date.now },
       createdBy: { type: ObjectId, ref: 'User' },
       updatedAt: { type: Date, default: Date.now },
