@@ -29,7 +29,10 @@ module.exports = function( caminio ){
     if( !req.user )
       return next();
 
-    if( req.param('camDomainId') && ( _.contains( req.user.camDomains, req.param('camDomainId') ) || req.user.superuser ) )
+    var usersCamDomains = req.user.camDomains;
+    if( usersCamDomains.length > 0 && usersCamDomains[0]._id )
+      usersCamDomains = usersCamDomains.map( function(dom){ return dom._id.toString(); });
+    if( req.param('camDomainId') && ( _.contains( usersCamDomains, req.param('camDomainId') ) || req.user.superuser ) )
       req.session.camDomainId = req.param('camDomainId');
 
     // if no session or no explicit request, set
