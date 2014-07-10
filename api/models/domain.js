@@ -213,6 +213,7 @@ function DomainModel( caminio, mongoose ){
         buildAppDef.requireAdmin = appDef.requireAdmin || false;
         buildAppDef.requireEditor = appDef.requireEditor || false;
         buildAppDef.requireTrusted = appDef.requireTrusted || false;
+        buildAppDef.dashboardAddons = appDef.dashboardAddons || [];
         buildAppDef.title = appDef.name;
         buildAppDef.i18n = appDef.i18n || appDef.name;
         available[appDef.name] = buildAppDef;
