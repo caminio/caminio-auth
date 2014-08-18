@@ -10,6 +10,7 @@ module.exports = function DomainsController( caminio, policies, middleware ){
   var mkdirp        = require('mkdirp');
   var fs            = require('fs');
   var join          = require('path').join;
+  var _             = require('lodash');
 
   return {
 
@@ -45,7 +46,7 @@ module.exports = function DomainsController( caminio, policies, middleware ){
     ],
 
     'show': [
-      requireSuperUser,
+      requireSuperUserOrMember,
       function( req, res ){
         Domain.find({ _id: req.param('id') }).populate('owner').exec( function( err, domains ){
           if( err ){ return res.json( 500, { error: 'server_error', details: err }); }
@@ -206,6 +207,15 @@ module.exports = function DomainsController( caminio, policies, middleware ){
     if( res.locals.currentUser.isSuperUser() )
       return next();
     if( req.domain.owner.toString() === req.user.id )
+      return next();
+    return res.json(403, { error: 'insufficient_rights' });
+  }
+
+  function requireSuperUserOrMember( req, res, next ){
+    if( res.locals.currentUser.isSuperUser() )
+      return next();
+    console.log('here', req.param('id'), req.user.camDomains[0], _.find(req.user.camDomains, { id: req.param('id') }));
+    if( _.find(req.user.camDomains, { id: req.param('id') }))
       return next();
     return res.json(403, { error: 'insufficient_rights' });
   }
