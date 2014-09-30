@@ -192,10 +192,12 @@ function UserModel( caminio, mongoose ){
    * @method generateConfirmationKey
    */
   schema.method('generateConfirmationKey', _generateConfirmationKey);
+  schema.method('generateApiKey', _generateApiKey);
 
   schema.pre('save', function( next ){ 
     if( !this.confirmation.expires || this.confirmation.expires < (new Date() - 1200) )
       this.generateConfirmationKey(); 
+      this.generateApiKey(); 
     next();
   });
 
@@ -204,6 +206,11 @@ function UserModel( caminio, mongoose ){
     this.confirmation.expires = new Date()+1800*1000;
     this.confirmation.tries = this.confirmation.tries || 0;
     this.confirmation.tries += 1;
+  }
+
+  function _generateApiKey(){
+    this.apiPublicKey = caminioUtil.uid(64);
+    this.apiPrivateKey = caminioUtil.uid(64);
   }
 
   /**
